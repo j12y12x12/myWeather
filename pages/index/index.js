@@ -4,6 +4,12 @@ const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia0
 Page({
   data: {
     motto: 'Hello World',
+    location: {
+      latitude: 0,
+      longitude: 0,
+      city:'',
+      district:''
+    },
     userInfo: {
       avatarUrl: defaultAvatarUrl,
       nickName: '',
@@ -12,6 +18,31 @@ Page({
     canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     canIUseNicknameComp: wx.canIUse('input.type.nickname'),
   },
+
+      // 获取位置信息
+      getUserLocation() {
+        console.log('点击位置');
+        const that = this
+        wx.getLocation({
+          type: 'wgs84',
+          success (res) {
+            const latitude = res.latitude
+            const longitude = res.longitude
+            const speed = res.speed
+            const accuracy = res.accuracy
+            console.log('位置信息  ',res);
+            that.setData({
+              "location.latitude": res.latitude,
+              "location.longitude": res.longitude,
+            })
+            
+          },
+          fail(res) {
+            console.log('位置信息失败  ',res);
+          }
+         })
+         
+      },
   bindViewTap() {
     wx.navigateTo({
       url: '../logs/logs'
