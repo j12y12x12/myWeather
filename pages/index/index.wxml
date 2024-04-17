@@ -3,7 +3,7 @@
   <view class="container">
     <view class="userinfo">
       <block>
-      <text>所在城市：未知</text>
+      <text>所在位置：{{location.address}}</text>
         <button class="avatar-wrapper" type="primary" bind:tap="getUserLocation">
           <!-- <image class="avatar" src="{{userInfo.avatarUrl}}"></image> -->
           获取当前位置
