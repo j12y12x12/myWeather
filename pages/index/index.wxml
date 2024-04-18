@@ -1,14 +1,17 @@
 <!--index.wxml-->
 <scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block>
-      <text>所在位置：{{location.address}}</text>
-        <button class="avatar-wrapper" type="primary" bind:tap="getUserLocation">
-          <!-- <image class="avatar" src="{{userInfo.avatarUrl}}"></image> -->
-          获取当前位置
-        </button>
-      </block>
+<view class="location-txt">
+  <text >{{location.address || '未获取到位置信息'}}</text>
+</view>
+  <view class="current-day">
+    <image class="header-weather-img" wx:if="{{dayImage}}" src="{{dayImage}}" mode="aspectFit"></image>
+    <view class="current-show">
+        <text class="current-temp" wx:if="{{dayWeather.temp}}" >{{dayWeather.temp + '°'}}</text>
+        <text class="current-desc" wx:if="{{dayWeather.text}}">{{dayWeather.text}}</text>
     </view>
   </view>
+  <button class="avatar-wrapper" type="primary" bind:tap="getUserLocation">
+    <!-- <image class="avatar" src="{{userInfo.avatarUrl}}"></image> -->
+    获取当前位置
+  </button>
 </scroll-view>

@@ -11,6 +11,8 @@ Page({
       longitude: 0,
       address:'',
     },
+    dayWeather:{},
+    dayImage:'',
     weatherInfo:null
 
     // hasUserInfo: false,
@@ -43,7 +45,8 @@ Page({
             // that.location.latitude = latitude
             // that.location.longitude = longitude
             that.fetchAddress(longitude,latitude)
-            that.fetchWeather(longitude,latitude)
+            that.fetchDayWeather(longitude,latitude)
+            that.fetchMinuteWeather(longitude,latitude)
           },
           fail(res) {
             console.log('位置信息失败  ',res);
@@ -70,7 +73,8 @@ Page({
           }
         })
       },
-      fetchWeather(lon, lat) {
+      // 近两小时天气
+      fetchMinuteWeather(lon, lat) {
         if (!lon || !lat) {
           console.log('经纬度为空');
           return
@@ -84,9 +88,35 @@ Page({
             key: '46dc1503ca4b4b189c88ac475ce69b1f'
           },
           success:function(res){ // 请求成功之后的回调函数
-            console.log('天气 ',res)
+            console.log('近两小时天气 ',res)
             that.setData({
               "weatherInfo": res.data,
+            })
+          }
+        })
+      },
+      // 当日天气
+      fetchDayWeather(lon, lat) {
+        if (!lon || !lat) {
+          console.log('经纬度为空');
+          return
+        }
+        const that = this
+        wx.request({
+          url:'https://devapi.qweather.com/v7/weather/now',
+          method: 'GET',      //请求的方式
+          data: {             //发送到服务器的数据
+            location: `${lon},${lat}`,
+            key: '46dc1503ca4b4b189c88ac475ce69b1f'
+          },
+          success:function(res){ // 请求成功之后的回调函数
+            console.log('实时天气 ',res)
+            const now = res.data.now
+            const imageCode = now.icon
+            const imageUrl = `../../assets/icon_weather/${imageCode}.png`
+            that.setData({
+              "dayWeather": now,
+              "dayImage":imageUrl
             })
           }
         })

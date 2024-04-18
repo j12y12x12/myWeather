@@ -1,44 +1,55 @@
 /**index.wxss**/
 page {
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
   flex-direction: column;
+  background-color: #4C9CE6;
 }
 .scrollarea {
-  flex: 1;
   overflow-y: hidden;
 }
 
-.userinfo {
+.header-weather-img {
+  width: 120rpx;
+  height: 120rpx;
+  margin-right: 38rpx;
+}
+.location-txt {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  color: #000000;
+  font-size: 22px;
+  margin-top: 60rpx;
+  margin-left: 30rpx;
+}
+
+.current-day {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 260rpx;
+}
+
+.current-temp {
+  font-size: 36px;
+}
+
+.current-desc {
+  font-size: 20px;
+
+}
+
+.current-show {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  color: #aaa;
-  width: 80%;
 }
 
-.userinfo-avatar {
-  overflow: hidden;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
 
-.usermotto {
-  margin-top: 200px;
-}
 
-.avatar-wrapper {
-  padding: 0;
-  width: 156px !important;
-  height: 44px;
-  line-height: 44px;
-  background-color: green;
-  border-radius: 8px;
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
+
+
 
 .avatar {
   display: block;
@@ -54,12 +65,4 @@ page {
   border-top: .5px solid rgba(0, 0, 0, 0.1);
   border-bottom: .5px solid rgba(0, 0, 0, 0.1);
   color: black;
-}
-
-.nickname-label {
-  width: 105px;
-}
-
-.nickname-input {
-  flex: 1;
 }
