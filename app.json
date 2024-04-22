@@ -6,7 +6,7 @@
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "乾坤天气",
-    "navigationBarBackgroundColor": "#4C9CE6"
+    "navigationBarBackgroundColor": "#fff"
   },
   "style": "v2",
   "componentFramework": "glass-easel",
