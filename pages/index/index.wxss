@@ -70,13 +70,15 @@
 }
 
 .seven-day-weather {
-  /* display: flex; */
-  /* flex-direction: row; */
+  display: flex;
+  width: 93%;  
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .day-weather-show-wrapper {
   display: flex;
-  padding: 0px 5px;
+  /* padding: 0px 5px; */
   /* background-color: red; */
   width: 484px;
 }
