@@ -10,8 +10,8 @@
 }
 
 .header-weather-img {
-  width: 150rpx;
-  height: 150rpx;
+  width: 130rpx;
+  height: 130rpx;
   margin-right: 38rpx;
 }
 .location-txt {
@@ -33,11 +33,11 @@
 }
 
 .current-temp {
-  font-size: 38px;
+  font-size: 36px;
 }
 
 .current-desc {
-  font-size: 24px;
+  font-size: 22px;
 
 }
 
@@ -70,22 +70,28 @@
 }
 
 .seven-day-weather {
+  /* display: flex; */
+  /* flex-direction: row; */
+}
+
+.day-weather-show-wrapper {
   display: flex;
-  flex-direction: row;
+  padding: 0px 5px;
+  /* background-color: red; */
+  width: 484px;
 }
 
 .day-weather-show {
   display: flex;
+  flex: 0.15;
   flex-direction: column;
-  width: 300rpx;
+  min-width: 60px;
   justify-content: center;
   align-items: center;
   color: #111e36;
-  /* margin-right: 15px;
-  margin-left: 15px;
-   */
-  padding: 0px 15px 0px 15px;
+  margin-right: 10px;  
   margin-bottom: 20px;
+  /* background-color: #fff; */
 }
 
 .day-weather-img {

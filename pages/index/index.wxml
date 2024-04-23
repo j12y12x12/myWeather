@@ -1,36 +1,35 @@
 <!--index.wxml-->
 <view class="all-container">
   <scroll-view class="scrollarea" scroll-y type="list">
-<view class="location-txt">
-  <text wx:if="!isLoading">{{ isLoading?'获取位置中...': (location.address || '未获取到位置信息')}}</text>
-  <button wx:if="{{!location.latitude && !isLoading}}" class="get-location" type="primary" bind:tap="getUserLocation">
-    获取位置
-  </button>
-</view>
-  <view class="current-day">
-    <image class="header-weather-img" wx:if="{{dayImage}}" src="{{dayImage}}" mode="aspectFit"></image>
-    <view class="current-show">
-        <text class="current-temp" wx:if="{{dayWeather.temp}}" >{{dayWeather.temp + '°'}}</text>
+    <view class="location-txt">
+      <text wx:if="!isLoading">{{ isLoading?'获取位置中...': (location.address || '未获取到位置信息')}}</text>
+      <button wx:if="{{!location.latitude && !isLoading}}" class="get-location" type="primary" bind:tap="getUserLocation">
+        获取位置
+      </button>
+    </view>
+    <view class="current-day">
+      <image class="header-weather-img" wx:if="{{dayImage}}" src="{{dayImage}}" mode="aspectFit"></image>
+      <view class="current-show">
+        <text class="current-temp" wx:if="{{dayWeather.temp}}">{{dayWeather.temp + '°'}}</text>
         <text class="current-desc" wx:if="{{dayWeather.text}}">{{dayWeather.text}}</text>
+      </view>
     </view>
-  </view>
-  <view class="minutes-weather">
-    <ec-canvas class="mychart" id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}">
-    </ec-canvas>
-  </view>
-  <scroll-view class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
-    <view class="day-weather-show-wrapper" style="display: flex;">
-    <view wx:for="{{sevenDayWeathers}}" wx:key="index" class="day-weather-show">
-      <text style="margin-bottom: 20rpx;">{{item.isToday?'今天': item.showDate}}</text>
-      <text style="margin-bottom: 20rpx;">{{item.textDay}}</text>
-      <image class="day-weather-img" src="{{item.iconDayUrl}}" mode="aspectFit" style="margin-bottom: 20rpx;"></image>
-      <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
-      <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
-      <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
-      <text>{{item.textNight}}</text>
+    <view class="minutes-weather">
+      <ec-canvas class="mychart" id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}">
+      </ec-canvas>
     </view>
-  </view>
+    <scroll-view class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
+      <view class="day-weather-show-wrapper">
+        <view wx:for="{{sevenDayWeathers}}" wx:key="index" class="day-weather-show">
+          <text style="margin-bottom: 20rpx;">{{item.isToday?'今天': item.showDate}}</text>
+          <text style="margin-bottom: 20rpx;">{{item.textDay}}</text>
+          <image class="day-weather-img" src="{{item.iconDayUrl}}" mode="aspectFit" style="margin-bottom: 20rpx;"></image>
+          <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
+          <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
+          <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
+          <text>{{item.textNight}}</text>
+        </view>
+      </view>
+    </scroll-view>
   </scroll-view>
-</scroll-view>
 </view>
-

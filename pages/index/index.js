@@ -28,6 +28,14 @@ Page({
     // canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     // canIUseNicknameComp: wx.canIUse('input.type.nickname'),
   },
+  // 分享给朋友
+  onShareAppMessage () {
+    
+  },
+  // 分享到朋友圈
+  onShareTimeline () {
+
+  },
   onShow: function() {
     // 页面显示时触发的操作
     wx.showLoading({
