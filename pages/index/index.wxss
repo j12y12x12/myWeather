@@ -71,7 +71,7 @@
 
 .seven-day-weather {
   display: flex;
-  width: 93%;  
+  width: 94%;  
   margin-left: 10px;
   margin-right: 10px;
 }

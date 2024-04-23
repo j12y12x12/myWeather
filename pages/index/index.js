@@ -182,7 +182,9 @@ Page({
                 obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
                 obj.iconNightUrl = `../../assets/icon_weather/${nightCode}.png`;
                 obj.isToday = isToday(obj.fxDate)
-                obj.showDate = obj.fxDate.substring(5)
+                const onlyDate = obj.fxDate.substring(5)
+                var modifiedDate = onlyDate.replace("-", "/");
+                obj.showDate = modifiedDate
               });
             }
             console.log('7日天气111 ',sevneDays)
