@@ -105,18 +105,20 @@
   display: flex;
   /* padding: 0px 5px; */
   /* background-color: red; */
-  width: 484px;
+  width: 420px;
 }
 
 .day-weather-show {
   display: flex;
   flex: 0.15;
   flex-direction: column;
-  min-width: 54px;
+  min-width: 50px;
+  max-width: 60px;
+
   justify-content: center;
   align-items: center;
   color: #111e36;
-  margin-right: 10px;  
+  /* margin-right: 10px;   */
   margin-bottom: 20px;
   /* background-color: #fff; */
 }
