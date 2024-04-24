@@ -8,6 +8,8 @@ const weather_key ='46dc1503ca4b4b189c88ac475ce69b1f'
 
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
+const weeks = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
 Page({
   data: {
     location: {
@@ -182,9 +184,12 @@ Page({
                 obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
                 obj.iconNightUrl = `../../assets/icon_weather/${nightCode}.png`;
                 obj.isToday = isToday(obj.fxDate)
+                var date = new Date(obj.fxDate);
+                var dayOfWeek = date.getDay();
                 const onlyDate = obj.fxDate.substring(5)
                 var modifiedDate = onlyDate.replace("-", "/");
                 obj.showDate = modifiedDate
+                obj.weekStr = weeks[dayOfWeek]
               });
             }
             console.log('7日天气111 ',sevneDays)
