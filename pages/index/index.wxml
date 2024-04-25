@@ -2,9 +2,9 @@
 <view class="all-container">
   <scroll-view class="scrollarea" scroll-y type="list">
     <view class="location-txt">
-      <text wx:if="!isLoading">{{ isLoading?'获取位置中...': (location.address || '未获取到位置信息')}}</text>
-      <button wx:if="{{!location.latitude && !isLoading}}" class="get-location" type="primary" bind:tap="getUserLocation">
-        获取位置
+      <text class="location-value" wx:if="!isLoading">{{ isLoading?'获取位置中...': (address || '未获取到位置信息')}}</text>
+      <button class="chose-location" bind:tap="selectLocation">
+        选择地点
       </button>
     </view>
     <view class="current-day">

@@ -1,6 +1,8 @@
 // index.js
+const chooseLocation = requirePlugin('chooseLocation');
 var QQMapWX = require('../../utils/libs/qqmap/qqmap-wx-jssdk.js');
 import * as echarts from '../../ec-canvas/echarts.min';
+const qqmapKey ='XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
 
 var qqmapsdk;
 let chart = null;
@@ -15,8 +17,8 @@ Page({
     location: {
       latitude: 0,
       longitude: 0,
-      address:'',
     },
+    address:'',
     isLoading:true,
     dayWeather:{},
     sevenDayWeathers:[],
@@ -38,36 +40,32 @@ Page({
   onShareTimeline () {
 
   },
-  onShow: function() {
-    // 页面显示时触发的操作
-    wx.showLoading({
-      title: '加载中...', // 提示的内容
-      mask: true // 是否显示透明蒙层，防止触摸穿透，默认为 false
+  // onShow: function() {
+  //   // 页面显示时触发的操作
+
+  //   console.log('选择器  ',chooseLocation);
+  //   // const location = chooseLocation.getLocation(); 
+  //   // console.log('选择的地点  ',location);
+  // },
+  onLoad: function () {
+    // 实例化API核心类
+    qqmapsdk = new QQMapWX({
+        key: qqmapKey
     });
     this.setData({
       "isLoading": true,
     })
     this.getUserLocation()
-  },
-  onLoad: function () {
-    // 实例化API核心类
-    qqmapsdk = new QQMapWX({
-        key: 'XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
-    });
 },
 
       // 获取位置信息
       getUserLocation() {
-        console.log('点击位置');
+
         const that = this
         wx.getLocation({
           type: 'gcj02',
           isHighAccuracy: true,   // 开启高精度
           success (res) {
-            wx.hideLoading();
-            that.setData({
-              "isLoading": false,
-            })
             const latitude = res.latitude
             const longitude = res.longitude
             console.log('位置信息  ',res);
@@ -77,10 +75,7 @@ Page({
             })
             // that.location.latitude = latitude
             // that.location.longitude = longitude
-            that.fetchAddress(longitude,latitude)
-            that.fetchDayWeather(longitude,latitude)
-            that.fetchMinuteWeather(longitude,latitude)
-            that.fetch7DayWeather(longitude,latitude)
+            that.fetchAllWeatherInfo(longitude,latitude)
           },
           fail(res) {
             wx.hideLoading();
@@ -91,6 +86,30 @@ Page({
           }
          })
       },
+      selectLocation() {
+        const that = this
+
+        wx.chooseLocation({
+          success: function (res) {
+             console.log('选择坐标',res); 
+             wx.showLoading({
+              title: '获取中...', // 提示的内容
+              mask: true // 是否显示透明蒙层，防止触摸穿透，默认为 false
+            });
+             that.fetchAllWeatherInfo(res.longitude,res.latitude)
+           },
+           fail: function () {
+           },
+           complete: function () {
+           }
+       })
+      },
+      fetchAllWeatherInfo(lon, lat) {
+        this.fetchAddress(lon,lat)
+        this.fetchDayWeather(lon,lat)
+        this.fetchMinuteWeather(lon,lat)
+        this.fetch7DayWeather(lon,lat)
+      },
       fetchAddress(lon, lat) {
         const that = this
         qqmapsdk.reverseGeocoder({
@@ -99,22 +118,36 @@ Page({
             longitude: lon
           },
           success: function (res1) {
-            console.log(res1.result);
             const address = res1.result.address_component
-            const addressDetail = `${address.city} ${address.district} ${address.street}`
+            let addressDetail = ''
+            if (address.city && address.district) {
+              addressDetail = address.street ? `${address.city} ${address.district} ${address.street}`:`${address.city} ${address.district}`
+            } else {
+              addressDetail = '这是哪里？'
+            }
             that.setData({
-              "location.address": addressDetail,
+              "address": addressDetail,
+            })
+            wx.hideLoading();
+            that.setData({
+              "isLoading": false,
             })
           },
           fail: function (res) {
-            console.log(res);
+            wx.hideLoading();
+            that.setData({
+              "isLoading": false,
+            })
+            wx.showToast({
+              title: '地址解析失败',
+              icon: 'none',
+            })
           }
         })
       },
       // 近两小时天气
       fetchMinuteWeather(lon, lat) {
         if (!lon || !lat) {
-          console.log('经纬度为空');
           return
         }
         const that = this
@@ -131,7 +164,13 @@ Page({
             })
             console.log('近两小时天气 ',that.data.hourWeather)
             that.showEcharts()
-          }
+          },
+          fail:function(res) {
+            wx.showToast({
+              title: '获取小时天气失败',
+              icon: 'none',
+            })
+            }
         })
       },
       // 当日天气
@@ -157,13 +196,19 @@ Page({
               "dayWeather": now,
               "dayImage":imageUrl
             })
+          },
+          fail:function(res) {
+
+wx.showToast({
+  title: '获取实时天气失败',
+  icon: 'none',
+})
           }
         })
       },
       // 7日天气
       fetch7DayWeather(lon, lat) {
         if (!lon || !lat) {
-          console.log('经纬度为空');
           return
         }
         const that = this
@@ -192,13 +237,18 @@ Page({
                 obj.weekStr = weeks[dayOfWeek]
               });
             }
-            console.log('7日天气111 ',sevneDays)
-
             that.setData({
               "sevenDayWeathers": sevneDays,
             })
 
-          }
+          },
+          fail:function(res) {
+
+            wx.showToast({
+              title: '获取近日天气失败',
+              icon: 'none',
+            })
+            }
         })
       },
 
@@ -220,7 +270,6 @@ Page({
    * 图表init
    */
   getOption(e) {
-    console.log('小时数据 ',this.hourWeather);
     const hourWeather = this.data.hourWeather
     const minutely = hourWeather.minutely
     const precipArray = minutely.map(item => item.precip);
