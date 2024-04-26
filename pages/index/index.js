@@ -22,7 +22,7 @@ Page({
     isLoading:true,
     dayWeather:{},
     sevenDayWeathers:[],
-    hourWeather:null,
+    hourWeather:{},
     dayImage:'',
     echartsComponnet:null,
     ec: {
@@ -96,6 +96,13 @@ Page({
               title: '获取中...', // 提示的内容
               mask: true // 是否显示透明蒙层，防止触摸穿透，默认为 false
             });
+            that.setData({
+              "isLoading": true,
+              "dayWeather":{},
+              "sevenDayWeathers":[],
+              "hourWeather":{},
+              "dayImage":''
+            })
              that.fetchAllWeatherInfo(res.longitude,res.latitude)
            },
            fail: function () {
