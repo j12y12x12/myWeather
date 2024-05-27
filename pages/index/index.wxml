@@ -36,7 +36,20 @@
       <ec-canvas class="mychart" id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}">
       </ec-canvas>
     </view>
-    <scroll-view class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
+    <view class="selected-tab" wx:if="{{sevenDayWeathers.length > 0}}">
+    <view class="chose-tab {{selectedTab == 0 ? 'tab-active' : ''}}" data-tab-id="0" bind:tap="selectTab">
+        7日
+    </view>
+    <view class="chose-tab {{selectedTab == 1 ? 'tab-active' : ''}}" data-tab-id="1" bind:tap="selectTab">
+        30日
+    </view>
+    </view>
+
+<view wx:if="{{selectedTab == 1}}" class="thirty-weather-view">
+这个功能再等等
+</view>
+
+    <scroll-view  wx:if="{{selectedTab == 0}}" class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
       <view class="day-weather-show-wrapper">
         <view wx:for="{{sevenDayWeathers}}" wx:key="index" class="day-weather-show">
           <text style="margin-bottom: 10rpx;font-size: 16px;">{{item.isToday?'今天': item.showDate}}</text>

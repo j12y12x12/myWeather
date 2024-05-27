@@ -18,6 +18,7 @@ Page({
       latitude: 0,
       longitude: 0,
     },
+    selectedTab:0,
     address:'',
     isLoading:true,
     dayWeather:{},
@@ -58,6 +59,13 @@ Page({
     this.getUserLocation()
 },
 
+selectTab(event) {
+  var tabId = event.currentTarget.dataset.tabId;
+  console.log('选择tab改变  ',tabId)
+  this.setData({
+    selectedTab: tabId,
+  })
+},
       // 获取位置信息
       getUserLocation() {
 
@@ -112,10 +120,14 @@ Page({
        })
       },
       fetchAllWeatherInfo(lon, lat) {
+        this.setData({
+          selectedTab: 0,
+        })
         this.fetchAddress(lon,lat)
         this.fetchDayWeather(lon,lat)
         this.fetchMinuteWeather(lon,lat)
         this.fetch7DayWeather(lon,lat)
+
       },
       fetchAddress(lon, lat) {
         const that = this
@@ -247,7 +259,6 @@ wx.showToast({
             that.setData({
               "sevenDayWeathers": sevneDays,
             })
-
           },
           fail:function(res) {
 
