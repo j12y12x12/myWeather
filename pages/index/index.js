@@ -83,6 +83,7 @@ selectTab(event) {
             })
             // that.location.latitude = latitude
             // that.location.longitude = longitude
+            that.fetchAddress(longitude,latitude)
             that.fetchAllWeatherInfo(longitude,latitude)
           },
           fail(res) {
@@ -111,6 +112,9 @@ selectTab(event) {
               "hourWeather":{},
               "dayImage":''
             })
+            that.setData({
+              address: res?.address || '这是哪里？',
+            })
              that.fetchAllWeatherInfo(res.longitude,res.latitude)
            },
            fail: function () {
@@ -123,11 +127,9 @@ selectTab(event) {
         this.setData({
           selectedTab: 0,
         })
-        this.fetchAddress(lon,lat)
         this.fetchDayWeather(lon,lat)
         this.fetchMinuteWeather(lon,lat)
         this.fetch7DayWeather(lon,lat)
-
       },
       fetchAddress(lon, lat) {
         const that = this
@@ -145,7 +147,7 @@ selectTab(event) {
               addressDetail = '这是哪里？'
             }
             that.setData({
-              "address": addressDetail,
+              address: addressDetail,
             })
             wx.hideLoading();
             that.setData({
@@ -256,12 +258,17 @@ wx.showToast({
                 obj.weekStr = weeks[dayOfWeek]
               });
             }
+            wx.hideLoading();
             that.setData({
               "sevenDayWeathers": sevneDays,
+              isLoading:false
             })
           },
           fail:function(res) {
-
+            wx.hideLoading();
+            that.setData({
+              isLoading:false
+            })
             wx.showToast({
               title: '获取近日天气失败',
               icon: 'none',

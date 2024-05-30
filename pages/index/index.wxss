@@ -129,9 +129,8 @@
   display: flex;
   flex: 0.15;
   flex-direction: column;
-  min-width: 50px;
-  max-width: 60px;
-
+  min-width: 64px;
+  max-width: 64px;
   justify-content: center;
   align-items: center;
   color: #111e36;
