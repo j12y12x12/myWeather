@@ -6,7 +6,11 @@ const qqmapKey ='XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
 
 var qqmapsdk;
 let chart = null;
-const weather_key ='46dc1503ca4b4b189c88ac475ce69b1f'
+// 免费key
+const free_weather_key ='46dc1503ca4b4b189c88ac475ce69b1f'
+// 付费key
+const charge_weather_key ='85df4159ecb14556bd88696334386822'
+
 
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
@@ -21,8 +25,10 @@ Page({
     selectedTab:0,
     address:'',
     isLoading:true,
+    isChangeLocation:false,
     dayWeather:{},
     sevenDayWeathers:[],
+    thirtyDayWeathers:[],
     hourWeather:{},
     dayImage:'',
     echartsComponnet:null,
@@ -65,6 +71,14 @@ selectTab(event) {
   this.setData({
     selectedTab: tabId,
   })
+  if (tabId == 1 && (this.data.isChangeLocation || this.data.thirtyDayWeathers.length == 0)) {
+    // 30日天气
+    let long = this.data.location.longitude;
+    let lat = this.data.location.latitude;
+    console.log( '保存的位置: ',this.data.location)
+    // console.log( '保存的位置lat: ',lat)
+    this.fetchThirtyDayWeather(long,lat)
+  }
 },
       // 获取位置信息
       getUserLocation() {
@@ -97,7 +111,7 @@ selectTab(event) {
       },
       selectLocation() {
         const that = this
-
+        console.log('选择定位')
         wx.chooseLocation({
           success: function (res) {
              console.log('选择坐标',res); 
@@ -106,14 +120,17 @@ selectTab(event) {
               mask: true // 是否显示透明蒙层，防止触摸穿透，默认为 false
             });
             that.setData({
-              "isLoading": true,
-              "dayWeather":{},
-              "sevenDayWeathers":[],
-              "hourWeather":{},
-              "dayImage":''
-            })
-            that.setData({
+              "location.latitude": res.latitude,
+              "location.longitude": res.longitude,
+              isLoading: true,
+              dayWeather:{},
+              sevenDayWeathers:[],
+              thirtyDayWeathers:[],
+              hourWeather:{},
+              dayImage:'',
               address: res?.address || '这是哪里？',
+              isChangeLocation:true,
+              selectedTab:0
             })
              that.fetchAllWeatherInfo(res.longitude,res.latitude)
            },
@@ -177,7 +194,7 @@ selectTab(event) {
           method: 'GET',      //请求的方式
           data: {             //发送到服务器的数据
             location: `${lon},${lat}`,
-            key: weather_key
+            key: free_weather_key
           },
           success:function(res){ // 请求成功之后的回调函数
             that.setData({
@@ -206,7 +223,7 @@ selectTab(event) {
           method: 'GET',      //请求的方式
           data: {             //发送到服务器的数据
             location: `${lon},${lat}`,
-            key: weather_key
+            key: free_weather_key
           },
           success:function(res){ // 请求成功之后的回调函数
             console.log('实时天气 ',res)
@@ -238,13 +255,13 @@ wx.showToast({
           method: 'GET',      //请求的方式
           data: {             //发送到服务器的数据
             location: `${lon},${lat}`,
-            key: weather_key
+            key: free_weather_key
           },
           success:function(res){ // 请求成功之后的回调函数
             console.log('7日天气 ',res)
-            const sevneDays = res.data.daily
-            if (sevneDays) {
-              sevneDays.forEach(function(obj) {
+            const sevenDays = res.data.daily
+            if (sevenDays) {
+              sevenDays.forEach(function(obj) {
                 const dayCode = obj.iconDay
                 const nightCode = obj.iconNight
                 obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
@@ -260,11 +277,75 @@ wx.showToast({
             }
             wx.hideLoading();
             that.setData({
-              "sevenDayWeathers": sevneDays,
+              "sevenDayWeathers": sevenDays,
               isLoading:false
             })
           },
           fail:function(res) {
+            wx.hideLoading();
+            that.setData({
+              isLoading:false
+            })
+            wx.showToast({
+              title: '获取近日天气失败',
+              icon: 'none',
+            })
+            }
+        })
+      },
+      // 30日天气
+      fetchThirtyDayWeather(lon, lat) {
+        if (!lon || !lat) {
+          return
+        }
+        const that = this
+        wx.request({
+          url:'https://api.qweather.com/v7/weather/30d',
+          method: 'GET',      //请求的方式
+          data: {             //发送到服务器的数据
+            location: `${lon},${lat}`,
+            key: charge_weather_key
+          },
+          success:function(res){ // 请求成功之后的回调函数
+            console.log('30日天气 ',res)
+            const code = res.data.code
+            console.log('30日天气code ',code)
+
+            if (code == 403) {
+              wx.hideLoading();
+              that.setData({
+                isLoading:false
+              })
+              wx.showToast({
+                title: 'Run out of money',
+                icon: 'none',
+              })
+            }
+            const thirtyDays = res.data.daily
+            if (thirtyDays) {
+              thirtyDays.forEach(function(obj) {
+                const dayCode = obj.iconDay
+                const nightCode = obj.iconNight
+                obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
+                obj.iconNightUrl = `../../assets/icon_weather/${nightCode}.png`;
+                obj.isToday = isToday(obj.fxDate)
+                var date = new Date(obj.fxDate);
+                var dayOfWeek = date.getDay();
+                const onlyDate = obj.fxDate.substring(5)
+                var modifiedDate = onlyDate.replace("-", "/");
+                obj.showDate = modifiedDate
+                obj.weekStr = weeks[dayOfWeek]
+              });
+            }
+            wx.hideLoading();
+            that.setData({
+              "thirtyDayWeathers": thirtyDays,
+              isLoading:false,
+              isChangeLocation:false
+            })
+          },
+          fail:function(res) {
+            console.log('获取30日天气失败: ',res)
             wx.hideLoading();
             that.setData({
               isLoading:false
