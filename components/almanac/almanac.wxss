@@ -1,0 +1,86 @@
+/* components/almanac/almanac.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  align-items: center;
+}
+
+.data-string {
+  margin-top: 30px;
+  margin-bottom: 0px;
+  font-size: 24px;
+  color: #111e36;
+}
+
+.lunarCalendar-view {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+.lunarCalendar-string {
+  font-size: 18px;
+  color: #777777;
+  height: 30px;
+  line-height: 30px;
+  text-align: center; /* 水平居中 */
+  margin-right: 15px;
+}
+
+.affair-view {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* 确保两个子元素左右对齐并有间距 */
+  align-items: center;
+  margin-left: 100px;
+  margin-right: 100px;
+  width: 340px;
+}
+
+.affair-background {
+  margin-right: 10px;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: center; */
+  align-items: center;
+}
+
+.suit-view {
+  color: #FFF;
+  background-color: #D4473D;
+  font-size: 17px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;  /* 确保最小尺寸 */
+  min-height: 28px; /* 确保最小尺寸 */
+  flex-shrink: 0;   /* 防止压缩 */  
+  line-height: 28px;
+  text-align: center; /* 水平居中 */
+  border-radius: 50%;  /* 设置圆角 */
+  margin-right: 10px;
+}
+.avoid-view {
+  color: #FFF;
+  background-color: #000;
+  font-size: 17px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;  /* 确保最小尺寸 */
+  min-height: 28px; /* 确保最小尺寸 */
+  flex-shrink: 0;   /* 防止压缩 */  
+  line-height: 28px;
+  text-align: center; /* 水平居中 */
+  border-radius: 50%;  /* 设置圆角 */
+  margin-right: 10px;
+}
+
+.suit-content {
+  font-size: 17px;
+  color: #111e36;
+}
+.avoid-content {
+  font-size: 17px;
+  color: #111e36;
+}

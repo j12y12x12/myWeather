@@ -1,5 +1,6 @@
 <!--index.wxml-->
 <view class="all-container">
+  <almanac date="{{ currentDay }}"  wx:if="{{currentDay.length > 0}}"></almanac>
   <scroll-view class="scrollarea" scroll-y type="list">
     <view class="location-txt">
       <text class="location-value" wx:if="!isLoading">{{ isLoading?'获取位置中...': (address || '未获取到位置信息')}}</text>

@@ -1,5 +1,6 @@
 // index.js
 const chooseLocation = requirePlugin('chooseLocation');
+const util = require('../../utils/util.js')
 var QQMapWX = require('../../utils/libs/qqmap/qqmap-wx-jssdk.js');
 import * as echarts from '../../ec-canvas/echarts.min';
 const qqmapKey ='XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
@@ -34,7 +35,8 @@ Page({
     echartsComponnet:null,
     ec: {
       lazyLoad: true // 延迟加载
-    }
+    },
+    currentDay:''
     // hasUserInfo: false,
     // canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     // canIUseNicknameComp: wx.canIUse('input.type.nickname'),
@@ -63,6 +65,10 @@ Page({
       "isLoading": true,
     })
     this.getUserLocation()
+    const currentDay = util.getCurrentDate()
+    this.setData({
+      currentDay
+    })
 },
 
 selectTab(event) {
