@@ -44,8 +44,11 @@ Component({
         success: (res) => {
           console.log('黄历结果: ',res.data)
           if (res.data.code == 1) {
+            const almanacData = res.data.data
+            almanacData.suit = almanacData?.suit?.replace(/\./g, ' ')
+            almanacData.avoid = almanacData?.avoid?.replace(/\./g, ' ')
             that.setData({
-              almanacData:res.data.data
+              almanacData
             });
           } else if (res.data.code == 101){
             wx.showToast({

@@ -32,15 +32,17 @@
   margin-top: 10px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between; /* 确保两个子元素左右对齐并有间距 */
+  justify-content: space-between;
   align-items: center;
   margin-left: 100px;
   margin-right: 100px;
   width: 340px;
+  gap: 15px;
 }
 
 .affair-background {
-  margin-right: 10px;
+  flex: 0.5;
+  margin-right: 0px;
   display: flex;
   flex-direction: row;
   /* justify-content: center; */
