@@ -8,6 +8,8 @@
   </text>
   <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.solarTerms}}
   </text>
+  <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0 ||periodString.length==0}}">{{periodString}}
+  </text>
   </view>
   <view class="affair-view" hidden="{{almanacData.suit.length==0}}">
     <view class="affair-background">

@@ -48,6 +48,7 @@ const formatWeekDate = (dateStr) => {
 
   return formattedDate;
 }
+
 module.exports = {
   formatTime,
   getCurrentDate,

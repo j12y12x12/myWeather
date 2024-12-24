@@ -1,5 +1,7 @@
 // components/almanac/almanac.js
 const util = require('../../utils/util.js')
+const SunCalc = require('suncalc'); // 引入 SunCalc 模块
+const { getWinterSolsticeNine } = require('../almanac/dateUtils');
 
 Component({
 
@@ -10,7 +12,8 @@ Component({
     date: {
       type: String,
       value: '', // 默认值为空，表示如果父组件没有传递日期，使用当前日期
-    }
+    },
+    periodString:''
   },
 
   /**
@@ -66,7 +69,8 @@ Component({
           console.error('请求失败', err);
         }
       });
-    }
+    },
+
   },
 
     /**
@@ -75,6 +79,13 @@ Component({
   lifetimes: {
     attached() {
       this.fetchData();
+      // let countDate = new Date('2025-1-8'); // 假设是2025年3月11日
+      let countDate = new Date(); 
+      const result = getWinterSolsticeNine(countDate);
+      this.setData({
+        periodString: result
+      });      
+      console.log('周期信息：',result)
     }
   }
 })
