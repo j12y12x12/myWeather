@@ -1,5 +1,6 @@
 <!--index.wxml-->
 <view class="all-container">
+  <view class="background-fixed"></view>
   <almanac date="{{ currentDay }}"  wx:if="{{currentDay.length > 0}}"></almanac>
   <scroll-view class="scrollarea" scroll-y type="list">
     <view class="location-txt">
