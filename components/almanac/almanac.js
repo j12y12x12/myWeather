@@ -25,8 +25,8 @@ Component({
       yearTips: '',
       chineseZodiac: '',
       lunarCalendar: '',
-      suit: '',
-      avoid: ''
+      suitArray: [],
+      avoidArray: []
     },  // 当天黄历信息
   },
 
@@ -48,8 +48,10 @@ Component({
           console.log('黄历结果: ',res.data)
           if (res.data.code == 1) {
             const almanacData = res.data.data
-            almanacData.suit = almanacData?.suit?.replace(/\./g, ' ')
-            almanacData.avoid = almanacData?.avoid?.replace(/\./g, ' ')
+            const suitStr = almanacData?.suit || "无"
+            const avoidStr = almanacData?.avoid || "无"
+            almanacData.suitArray = suitStr.split(".")
+            almanacData.avoidArray = avoidStr.split(".")
             that.setData({
               almanacData
             });

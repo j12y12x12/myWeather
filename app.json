@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/tide/tide"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -14,12 +15,13 @@
   "lazyCodeLoading": "requiredComponents",
   "permission": {
     "scope.userLocation": {
-        "desc": "查询附近天气需获取您的位置信息"
+      "desc": "查询附近天气需获取您的位置信息"
     }
   },
   "requiredPrivateInfos": [
     "getLocation",
-    "chooseLocation"  ],
+    "chooseLocation"
+  ],
   "plugins": {
     "chooseLocation": {
       "version": "1.0.2",

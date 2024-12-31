@@ -3,22 +3,30 @@
   <text class="data-string">{{currentDate}}</text>
   <view class="lunarCalendar-view ">
     <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.yearTips + almanacData.chineseZodiac +'年'}}
-  </text>
-  <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.lunarCalendar}}
-  </text>
-  <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.solarTerms}}
-  </text>
-  <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0 ||periodString.length==0}}">{{periodString}}
-  </text>
+    </text>
+    <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.lunarCalendar}}
+    </text>
+    <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0}}">{{almanacData.solarTerms}}
+    </text>
+    <text class="lunarCalendar-string" hidden="{{almanacData.yearTips.length==0 ||periodString.length==0}}">{{periodString}}
+    </text>
   </view>
-  <view class="affair-view" hidden="{{almanacData.suit.length==0}}">
+  <view class="affair-view" wx:if="{{almanacData.suitArray.length>0}}">
     <view class="affair-background">
       <text class="suit-view">宜</text>
-      <text class="suit-content"> {{ almanacData.suit}}</text>
+      <view class="data-container">
+        <view class="item" wx:for="{{almanacData.suitArray}}" wx:key="index">
+          {{item}}
+        </view>
+      </view>
     </view>
     <view class="affair-background">
       <text class="avoid-view">忌</text>
-      <text class="avoid-content"> {{ almanacData.avoid}}</text>
+      <view class="data-container">
+        <view class="item" wx:for="{{almanacData.avoidArray}}" wx:key="index">
+          {{item}}
+        </view>
+      </view>
     </view>
   </view>
 </view>

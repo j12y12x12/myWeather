@@ -34,8 +34,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-left: 100px;
-  margin-right: 100px;
+  margin-left: 120px;
+  margin-right: 120px;
   width: 340px;
   gap: 15px;
 }
@@ -78,11 +78,17 @@
   margin-right: 10px;
 }
 
-.suit-content {
-  font-size: 17px;
-  color: #111e36;
+
+.data-container {
+  display: flex;
+  /* width: 100px; */
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 10px;
+  row-gap: 5px;
 }
-.avoid-content {
+.item {
   font-size: 17px;
   color: #111e36;
 }
