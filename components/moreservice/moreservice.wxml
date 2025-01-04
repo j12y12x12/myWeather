@@ -2,12 +2,9 @@
 <view class="service-container">
   <view class="service-title">其它功能</view>
   <view class="buttons-content">
-
-  <block wx:for="{{buttons}}" wx:key="index">
-    <button 
-      bindtap="onButtonClick" 
-      data-action="{{item.action}}">{{item.name}}</button>
-  </block>
-</view>
+    <block wx:for="{{buttons}}" wx:key="index">
+      <button class="button-item" bindtap="onButtonClick" data-action="{{item.action}}">{{item.name}}</button>
+    </block>
+  </view>
 
 </view>

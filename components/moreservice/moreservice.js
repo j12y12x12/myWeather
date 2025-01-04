@@ -14,9 +14,7 @@ Component({
    */
   data: {
     buttons: [
-      { name: '潮汐数据', action: 'showTide' },
-      { name: '修改数据', action: 'updateData' },
-      { name: '调用接口', action: 'callAPI' }
+      { name: '海洋潮汐', action: 'showTide' }
     ]
     },
 

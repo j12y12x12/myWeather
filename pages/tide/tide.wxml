@@ -1,2 +1,33 @@
 <!--pages/tide/tide.wxml-->
-<text>pages/tide/tide.wxml</text>
+<view class="tide-container">
+  <view class="background-fixed"></view>
+  <view class="location-txt">
+    <text class="location-value">{{ (address || '未获取到位置信息')}}</text>
+    <button class="chose-location" bind:tap="selectLocation">
+      选择地点
+    </button>
+  </view>
+
+  <!-- <view class="tabs-container"> -->
+  <scroll-view wx:if="{{poiId.length > 0}}" class="date-tabs-scrollow" scroll-x="true" style="white-space: nowrap;">
+  <view class="date-tabs">
+    <view wx:for="{{tabData}}" wx:key="index" class="{{item.isSelected === 1 ? 'selected-item' : 'normal-item'}}" bindtap="switchDate" data-date="{{item.date}}">
+        <text class="date-text">{{item.isToday === 1 ? '今天' : item.showStr}}</text>
+        <text class="week-text">{{item.week}}</text>
+    </view>
+  </view>
+
+  </scroll-view>
+  <!-- </view> -->
+
+  <view hidden="{{poiId.length == 0}}" class="tide-charts">
+    <ec-canvas class="my-tide" id="tide-dom-bar" canvas-id="tide-bar" ec="{{ ec }}">
+    </ec-canvas>
+  </view>
+  <view class="ganhai-container" wx:if="{{poiId.length > 0 && ganhaiDataArray.length > 0}}">
+    <text class="ganhai-title">推荐赶海时间</text>
+    <view class="data-item" wx:for="{{ganhaiDataArray}}" wx:key="index">
+      {{item}}
+    </view>
+  </view>
+</view>

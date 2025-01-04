@@ -3,5 +3,18 @@
   "projectname": "myWeather",
   "setting": {
     "compileHotReLoad": true
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "潮汐页",
+          "pathName": "pages/tide/tide",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
   }
 }

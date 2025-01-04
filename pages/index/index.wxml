@@ -79,5 +79,5 @@
       </view>
     </scroll-view>
   </scroll-view>
-  <!-- <moreservice></moreservice> -->
+  <moreservice wx:if="{{location.longitude > 0}}"></moreservice>
 </view>

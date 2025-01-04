@@ -40,7 +40,7 @@ const formatWeekDate = (dateStr) => {
   const date = new Date(`${year}-${month}-${day}`);
 
   // 获取星期几
-  const weekDays = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
   const weekDay = weekDays[date.getDay()];
 
   // 格式化日期为 'YYYY年MM月DD日 星期X'
