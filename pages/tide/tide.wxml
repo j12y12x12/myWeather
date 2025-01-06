@@ -9,7 +9,7 @@
   </view>
 
   <!-- <view class="tabs-container"> -->
-  <scroll-view wx:if="{{poiId.length > 0}}" class="date-tabs-scrollow" scroll-x="true" style="white-space: nowrap;">
+  <scroll-view class="date-tabs-scrollow" scroll-x="true" style="white-space: nowrap;">
   <view class="date-tabs">
     <view wx:for="{{tabData}}" wx:key="index" class="{{item.isSelected === 1 ? 'selected-item' : 'normal-item'}}" bindtap="switchDate" data-date="{{item.date}}">
         <text class="date-text">{{item.isToday === 1 ? '今天' : item.showStr}}</text>
@@ -23,6 +23,14 @@
   <view hidden="{{poiId.length == 0}}" class="tide-charts">
     <ec-canvas class="my-tide" id="tide-dom-bar" canvas-id="tide-bar" ec="{{ ec }}">
     </ec-canvas>
+  </view>
+  <view class="tide-table-view" wx:if="{{tideTableData.length > 0}}">
+    <text class="tide-title">潮况</text>
+    <view class="tide-item" wx:for="{{tideTableData}}" wx:key="index">
+      <text class="tide-text">{{item.type}}</text>
+      <text class="tide-time">时间：{{item.fxTime}}</text>
+      <text class="tide-value">潮高：{{item.height}} 米</text>
+    </view>
   </view>
   <view class="ganhai-container" wx:if="{{poiId.length > 0 && ganhaiDataArray.length > 0}}">
     <text class="ganhai-title">推荐赶海时间</text>

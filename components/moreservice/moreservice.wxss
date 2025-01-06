@@ -8,6 +8,7 @@
 
 .service-title {
 font-size: 20px;
+font-weight: 500;
 color: #111e36;
 margin-bottom: 10px;
 margin-top: 10px;
@@ -26,7 +27,7 @@ margin-top: 10px;
   padding: 10px;
   font-size: 16px;
   border-radius: 5px;
-  background-color: #dfdfdf;
+  background-color: #e5e5e5;
   color: #111e36;
   width: 100px;
 }

@@ -1,9 +1,9 @@
 /* pages/tide/tide.wxss */
 
 .tide-container {
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.9);
   margin: 15px 15px 50px 15px;
-  border-radius: 8px;
+  border-radius: 5px;
   overflow-y: auto;  /* 如果内容过长，可以开启滚动 */
   flex-grow: 1;  /* 如果需要填满剩余空间 */
   min-height: 600px;
@@ -46,6 +46,46 @@
   margin-top: 20px;
 }
 
+.tide-table-view {
+  margin-top: 0px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  /* align-items: center; */
+}
+
+.tide-title {
+  font-size: 18px;
+  color: #111e36;
+  font-weight: 500;
+}
+.tide-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* justify-content: center; */
+  margin-top: 5px;
+}
+
+.tide-text {
+  font-size: 16px;
+  color: #111e36;
+}
+.tide-time {
+  margin-left: 20px;
+  font-size: 16px;
+  width: 110px;
+  color: #666666;
+}
+.tide-value {
+  margin-left: 2px;
+  font-size: 16px;
+  width: 150px;
+  color: #666666;
+}
+
+
 /* 或者 */
 scroll-view {
   -webkit-overflow-scrolling: touch; /* 保持滚动流畅 */
@@ -64,16 +104,18 @@ scroll-view {
   flex-direction: column;
   padding: 10px 10px;
   text-align: center;
-  width: 60px;
+  width: auto;
+  min-width: 42px;
 }
 .selected-item {
   display: flex;
   flex-direction: column;
   padding: 10px 10px;
   text-align: center;
-  width: 60px;
+  width: auto;
+  min-width: 42px;
   background-color: #dddddd; /* 选中日期的背景色 */
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .date-text {
@@ -89,7 +131,7 @@ scroll-view {
 .tide-charts {
   width: 100%;
   height: 580rpx;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 .my-tide {
@@ -109,11 +151,12 @@ scroll-view {
 .ganhai-title {
   font-size: 18px;
   color: #111e36;
+  font-weight: 500;
 }
 
 .data-item {
-  font-size: 14px;
-  color: #555555;
+  font-size: 16px;
+  color: #666666;
   margin-top: 5px;
 }
 

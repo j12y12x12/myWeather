@@ -18,6 +18,8 @@ Page({
     poiId: '',
     tideHourData: [],
     tideTableData: [],
+    highTideData: null,
+    lowTideData: null,
     echartsComponnet: null,
     ganhaiDataArray: '',
     selectedDate: '',
@@ -113,7 +115,6 @@ Page({
     let month = (date.getMonth() + 1).toString().padStart(2, '0');
     let day = date.getDate().toString().padStart(2, '0');
     let dayStr = `${year}${month}${day}`;
-    console.log('日期sssss  ',dayStr);
     return dayStr;
   },
 
@@ -146,8 +147,23 @@ Page({
       tabData: tabData
     });
 
+    if (this.data.poiId.length == 0) {
+
+      wx.showToast({
+        title: '未查询到潮汐数据',
+        icon: 'none',
+      })
+      return
+    }
     this.getTideData(this.data.selectedDate, this.data.poiId)
 
+  },
+
+
+  // 格式化 fxTime 为 hh:mm
+  formatTime(time) {
+    const date = new Date(time);
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   },
 
   fetchPoiData(lon, lat, successCallback, errorCallback) {
@@ -223,14 +239,21 @@ Page({
 
         const tideHourlys = res.data.tideHourly
         if (tideHourlys && tideHourlys.length > 0) {
+          const tideTableArray = res.data.tideTable
+
+          const changedTideTable = that.changeTideTable(tideTableArray)
+          console.log('满潮信息  ',changedTideTable)
           that.setData({
-            tideHourData: tideHourlys
+            tideHourData: tideHourlys,
+            tideTableData: changedTideTable
           })
           that.showEcharts()
         } else {
           that.setData({
             tideHourData: [],
             tideTableData: [],
+            highTideData: null,
+            lowTideData: null,
             ganhaiDataArray: '',
           })
           wx.showToast({
@@ -252,6 +275,22 @@ Page({
 
   },
 
+  changeTideTable(tideTable) {
+    // 转换逻辑
+    const transformedTideTable = tideTable.map(item => {
+      // 提取 fxTime 的小时和分钟部分
+      const time = item.fxTime.split('T')[1].split('+')[0].substring(0, 5); // 提取 "HH:MM"
+      // 根据 type 转换为中文描述
+      const type = item.type === "H" ? "满潮" : "干潮";
+      // 构建新结构
+      return {
+        fxTime: time,
+        height: item.height,
+        type: type
+      };
+    });
+    return transformedTideTable
+  },
 
   selectLocation() {
     const that = this
@@ -282,6 +321,8 @@ Page({
                 poiId: '',
                 tideHourData: [],
                 tideTableData: [],
+                highTideData: null,
+                lowTideData: null,
                 ganhaiDataArray: '',
               })
               wx.showToast({
@@ -357,11 +398,10 @@ Page({
       timeStr = `${timeStr}（赶海指数：优，潮高低于0.5米）`
       ganhaiArray.push(timeStr)
     }
-    if (ganhaiTime2.length > 0) {
+    if (ganhaiArray.length == 0 && ganhaiTime2.length > 0) {
       let timeStr = ganhaiTime2.join(', ')
       timeStr = `${timeStr}（赶海指数：良，潮高低于1米）`
       ganhaiArray.push(timeStr)
-
     }
     if (ganhaiArray.length == 0 && ganhaiTime3.length > 0) {
       let timeStr = ganhaiTime3.join(', ')
@@ -376,9 +416,11 @@ Page({
     this.setData({
       ganhaiDataArray: ganhaiArray
     })
+    const formattedDate = this.data.selectedDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+
     var option = {
       title: {
-        text: "潮汐数据（单位：米）",
+        text: `${formattedDate} 潮汐数据（单位：米）`,
         left: 'center'
       },
       xAxis: {
@@ -432,26 +474,45 @@ Page({
   findTidePeriodsBelowThreshold(hourlyArray, threshold) {
     let periods = [];
     let start = null; // 用于标记开始时间
+    let isDescending = false; // 标记是否在下降趋势中
 
-    for (let i = 0; i < hourlyArray.length; i++) {
+    for (let i = 1; i < hourlyArray.length; i++) { // 从第2个数据点开始（索引1）
       let currentTide = hourlyArray[i]; // 获取当前小时的潮位
-      let currentTime = `${i.toString().padStart(2, '0')}:00`; // 格式化时间字符串
+      let previousTide = hourlyArray[i - 1]; // 获取前一个小时的潮位
+      let currentTime = `${i.toString().padStart(2, '0')}:00`; // 格式化当前时间字符串
+      let previousTime = `${(i - 1).toString().padStart(2, '0')}:00`; // 前一个小时的时间
 
-      // 如果潮位小于阈值且start为null，说明找到一个新的时间段的开始
-      if (currentTide < threshold && start === null) {
-        start = currentTime;
-      }
-
-      // 如果潮位大于等于阈值并且start不为null，说明找到时间段的结束
-      if (currentTide >= threshold && start !== null) {
-        periods.push(`${start}-${currentTime}`);
-        start = null; // 重置start
+      // 判断潮汐是否低于阈值并且处于下降趋势
+      if (currentTide < threshold && currentTide < previousTide) {
+        if (start === null) { // 如果没有开始时间，说明找到了下降趋势的开始
+          start = currentTime;
+          isDescending = true;
+        }
+      } else if (currentTide >= threshold || currentTide > previousTide) {
+        // 如果潮位大于等于阈值或潮位上升，并且之前有下降趋势，说明找到了时间段的结束
+        if (start !== null && isDescending) {
+          // 如果开始和结束时间相同，取前一个小时作为结束时间
+          if (start === previousTime) {
+            periods.push(`${(i - 2).toString().padStart(2, '0')}:00-${previousTime}`);
+          } else {
+            periods.push(`${start}-${previousTime}`);
+          }
+          start = null; // 重置开始时间
+          isDescending = false; // 重置下降趋势标记
+        }
       }
     }
 
-    // 如果最后一个时间段仍然没有结束（即数组的最后一项是小于阈值的）
-    if (start !== null) {
-      periods.push(`${start}-${`${hourlyArray.length - 1}`.padStart(2, '0')}:00`);
+    // 处理最后一段，如果仍然处于下降趋势并且结束时间未设置
+    if (start !== null && isDescending) {
+      let lastHour = (hourlyArray.length - 1).toString().padStart(2, '0') + ':00';
+      if (start !== lastHour) {
+        // 如果最后一个时间段的开始和结束时间不相同，正常返回
+        periods.push(`${start}-${lastHour}`);
+      } else {
+        // 如果最后一段时间段的开始时间和结束时间相同，取前一个小时
+        periods.push(`${(hourlyArray.length - 2).toString().padStart(2, '0')}:00-${lastHour}`);
+      }
     }
 
     return periods;

@@ -2,5 +2,5 @@
   "usingComponents": {
     "ec-canvas": "../../ec-canvas/ec-canvas"
   },
-  "navigationBarTitleText": "潮汐数据"
+  "navigationBarTitleText": "海洋潮汐"
 }

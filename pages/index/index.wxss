@@ -1,9 +1,9 @@
 /**index.wxss**/
 
 .all-container {
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.9);
   margin: 15px 15px 50px 15px;
-  border-radius: 8px;
+  border-radius: 5px;
   overflow-y: auto;  /* 如果内容过长，可以开启滚动 */
   flex-grow: 1;  /* 如果需要填满剩余空间 */
 }
