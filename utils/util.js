@@ -49,9 +49,16 @@ const formatWeekDate = (dateStr) => {
   return formattedDate;
 }
 
+  // 格式化 fxTime 为 hh:mm
+  const formatHourTime = (time) => {
+    const date = new Date(time);
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  }
+
 module.exports = {
   formatTime,
   getCurrentDate,
   getCurrentDateLong,
-  formatWeekDate
+  formatWeekDate,
+  formatHourTime
 }

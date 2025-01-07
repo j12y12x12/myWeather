@@ -20,7 +20,7 @@ margin-top: 10px;
   gap: 15px;
   justify-content: flex-start;
   align-items: flex-start;      /* 垂直方向上对齐到顶部 */
-  width: 100px;
+  width: 200px;
 }
 
 .button-item {
@@ -29,5 +29,5 @@ margin-top: 10px;
   border-radius: 5px;
   background-color: #e5e5e5;
   color: #111e36;
-  width: 100px;
+  max-width: 100px;
 }

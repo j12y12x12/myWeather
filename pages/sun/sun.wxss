@@ -1,21 +1,14 @@
-/**index.wxss**/
-
-.all-container {
+/* pages/sun/sun.wxss */
+.tide-container {
   background-color: rgba(255, 255, 255, 0.9);
   margin: 15px 15px 50px 15px;
   border-radius: 5px;
   overflow-y: auto;  /* 如果内容过长，可以开启滚动 */
   flex-grow: 1;  /* 如果需要填满剩余空间 */
-}
-.scrollarea {
-  overflow-y: hidden;
+  min-height: 340px;
+  padding-bottom: 30px;
 }
 
-.header-weather-img {
-  width: 130rpx;
-  height: 130rpx;
-  margin-right: 38rpx;
-}
 .location-txt {
   display: flex;
   flex-direction: row;
@@ -26,76 +19,7 @@
   margin-top: 40rpx;
   margin-left: 30rpx;
   margin-right: 30rpx;
-}
-
-.current-day {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  height: 180rpx;
-}
-
-.current-temp {
-  font-size: 36px;
-}
-
-.current-desc {
-  font-size: 22px;
-}
-
-.current-show {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.wather-detail {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20rpx;
-  padding: 0px 25px;
-}
-
-.detail-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20rpx;
-  align-items: center;
-}
-
-.datail-title {
-  font-size: 12px;
-  color: #777777;
-}
-.datail-value {
-  font-size: 14px;
-  margin-top: 10rpx;
-}
-
-.minutes-weather {
-  width: 100%;
-  height: 380rpx;
-}
-
-.time-text {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.mychart {
-  width: 100%;
-  height: 190px;
-  background-color: #fff;
-}
-
-.get-location {
-  max-width: 240rpx;
+  /* background-color: orange; */
 }
 
 .chose-location {
@@ -116,71 +40,90 @@
   margin-right: 20rpx;
 }
 
-.seven-day-weather {
+.date-tabs-scrollow {
   display: flex;
+  height: 90px;
   width: 94%;  
-  height: 290px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 20px;
 }
-
-.day-weather-show-wrapper {
+.sun-view {
   display: flex;
-  /* padding: 0px 5px; */
-  /* background-color: red; */
-  width: 420px;
-}
-
-.day-weather-show {
-  display: flex;
-  flex: 0.15;
   flex-direction: column;
-  min-width: 64px;
-  max-width: 64px;
-  justify-content: center;
+  margin-top: 0px;
+  width: 100%;
   align-items: center;
-  color: #111e36;
-  /* margin-right: 10px;   */
-  margin-bottom: 20px;
-  /* background-color: #fff; */
-}
-
-.day-weather-img {
-  width: 50rpx;
-  height: 50rpx;
-}
-.selected-tab {
-  display: flex;
-  flex-direction:row;
-  margin-bottom: 10px;
-  gap: 20px;
-  margin-left: 25px;
-}
-
-.chose-tab {
-  flex: 1;
-  max-width: 80rpx;
-  max-height: 44rpx;
-  padding: 5px;
-  font-size: 14px;
-  background-color: #efefef;
-  color: #111e36;
-  display: flex;
   justify-content: center;
-  border-radius: 4px;
 }
 
-.tab-active {
-  background-color: #808080;
-  color: white;
+.sun-date {
+  font-size: 20px;
 }
 
-.thirty-weather-view {
-  height: 400rpx;
-  font-size: 24px;
-  padding: 20px 20px;
+.sun-content {
+  display: flex;
+  flex-direction: row;
+  margin-top: 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.sun-rise {
+margin-right: 40px;
+}
+.sun-set {
   color: #111e36;
 }
+.title {
+  color: #111e36;
+  font-size: 18px;
+}
+
+.time {
+  margin-left: 10px;
+  color: #777777;
+  font-size: 18px;
+}
+
+.date-tabs {
+  width: 100%;
+  display: flex;  
+  flex-direction: row;
+  overflow-x: auto;  /* 添加滚动效果 */
+}
+
+.normal-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  text-align: center;
+  width: auto;
+  min-width: 42px;
+}
+.selected-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  text-align: center;
+  width: auto;
+  min-width: 42px;
+  background-color: #dddddd; /* 选中日期的背景色 */
+  border-radius: 5px;
+}
+
+.date-text {
+  font-size: 16px;
+  color: #111e36;
+}
+
+.week-text {
+  font-size: 12px;
+  color: #777777;
+}
+
+
+
 .background-fixed::before {
   content: '';
   position: fixed;

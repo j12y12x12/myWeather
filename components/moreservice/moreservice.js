@@ -14,7 +14,8 @@ Component({
    */
   data: {
     buttons: [
-      { name: '海洋潮汐', action: 'showTide' }
+      { name: '海洋潮汐', action: 'showTide' },
+      { name: '日出日落', action: 'showSun' }
     ]
     },
 
@@ -32,6 +33,12 @@ Component({
           console.log('点击潮汐')
           wx.navigateTo({
             url: '/pages/tide/tide'
+          });
+          break;
+          case 'showSun':
+          console.log('点击日出')
+          wx.navigateTo({
+            url: '/pages/sun/sun'
           });
           break;
         default:

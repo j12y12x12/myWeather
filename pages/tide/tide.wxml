@@ -20,6 +20,10 @@
   </scroll-view>
   <!-- </view> -->
 
+<view class="no-data-content" wx:if="{{poiId.length == 0}}">
+<text class="no-data-text">未查询到潮汐数据</text>
+<text class="no-data-text">尝试换一个海滨城市吧~</text>
+</view>
   <view hidden="{{poiId.length == 0}}" class="tide-charts">
     <ec-canvas class="my-tide" id="tide-dom-bar" canvas-id="tide-bar" ec="{{ ec }}">
     </ec-canvas>

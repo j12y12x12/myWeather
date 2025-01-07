@@ -1,0 +1,38 @@
+<!--pages/sun/sun.wxml-->
+<view class="tide-container">
+  <view class="background-fixed"></view>
+  <view class="location-txt">
+    <text class="location-value">{{ (address || '未获取到位置信息')}}</text>
+    <button class="chose-location" bind:tap="selectLocation">
+      选择地点
+    </button>
+  </view>
+
+  <!-- <view class="tabs-container"> -->
+  <scroll-view class="date-tabs-scrollow" scroll-x="true" style="white-space: nowrap;">
+    <view class="date-tabs">
+      <view wx:for="{{tabData}}" wx:key="index" class="{{item.isSelected === 1 ? 'selected-item' : 'normal-item'}}" bindtap="switchDate" data-date="{{item.date}}">
+        <text class="date-text">{{item.isToday === 1 ? '今天' : item.showStr}}</text>
+        <text class="week-text">{{item.week}}</text>
+      </view>
+    </view>
+  </scroll-view>
+  <!-- </view> -->
+
+<view class="sun-view">
+  <text class="sun-date">{{showSelectedDate + ' 日出日落'}}</text>
+  <view class="sun-content">
+    <view class="sun-rise">
+      <text class="title">日出时间</text>
+      <text class="time">{{sunrise || '无'}}</text>
+    </view>
+    <view class="sun-set">
+      <text class="title">日落时间</text>
+      <text class="time">{{sunset || '无'}}</text>
+    </view>
+  </view>
+</view>
+
+
+
+</view>

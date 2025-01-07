@@ -2,7 +2,9 @@
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
-    "pages/tide/tide"
+    "pages/tide/tide",
+    "pages/sun/sun"
+
   ],
   "window": {
     "navigationBarTextStyle": "black",

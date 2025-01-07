@@ -159,13 +159,6 @@ Page({
 
   },
 
-
-  // 格式化 fxTime 为 hh:mm
-  formatTime(time) {
-    const date = new Date(time);
-    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-  },
-
   fetchPoiData(lon, lat, successCallback, errorCallback) {
     // 请求接口的URL
     const url = 'https://geoapi.qweather.com/v2/poi/lookup'
@@ -383,8 +376,9 @@ Page({
     // 固定两端的时间
     xAxisData[0] = '00:00';
     xAxisData[23] = '23:00';
+    xAxisData[12] = '12:00';
 
-    // 显示最小值和最大值对应的时间
+    // // 显示最小值和最大值对应的时间
     xAxisData[minIndex] = `${minIndex < 10 ? '0' : ''}${minIndex}:00`;
     xAxisData[maxIndex] = `${maxIndex < 10 ? '0' : ''}${maxIndex}:00`;
 
@@ -441,7 +435,7 @@ Page({
       yAxis: {
         x: 'center',
         type: 'value',
-        min: -1,
+        min: -0.5,
         axisLabel: {
           show: true, // 不显示坐标轴上的文字
         }
