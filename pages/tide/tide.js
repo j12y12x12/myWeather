@@ -396,17 +396,17 @@ Page({
 
     if (ganhaiTime1.length > 0) {
       let timeStr = ganhaiTime1.join(', ')
-      timeStr = `${timeStr}（赶海指数：优，最低潮小于0.5米）`
+      timeStr = `${timeStr}（赶海指数：优，低潮小于0.5米）`
       ganhaiArray.push(timeStr)
     }
     if (ganhaiTime2.length > 0) {
       let timeStr = ganhaiTime2.join(', ')
-      timeStr = `${timeStr}（赶海指数：良，最低潮小于1米）`
+      timeStr = `${timeStr}（赶海指数：良，低潮小于1米）`
       ganhaiArray.push(timeStr)
     }
     if (ganhaiTime3.length > 0) {
       let timeStr = ganhaiTime3.join(', ')
-      timeStr = `${timeStr}（赶海指数：中，最低潮小于1.5米）`
+      timeStr = `${timeStr}（赶海指数：中，低潮小于1.5米）`
       ganhaiArray.push(timeStr)
     }
     if (ganhaiArray.length == 0) {
