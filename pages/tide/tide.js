@@ -382,34 +382,40 @@ Page({
     xAxisData[minIndex] = `${minIndex < 10 ? '0' : ''}${minIndex}:00`;
     xAxisData[maxIndex] = `${maxIndex < 10 ? '0' : ''}${maxIndex}:00`;
 
-    const ganhaiTime1 = this.findTidePeriodsBelowThreshold(hourlyArray, 0.5)
-    const ganhaiTime2 = this.findTidePeriodsBelowThreshold(hourlyArray, 1)
-    const ganhaiTime3 = this.findTidePeriodsBelowThreshold(hourlyArray, 1.5)
+    const ganhaiDataArray = this.findTidalTrends(hourlyArray)
+    console.log('合适赶海时间 ',ganhaiDataArray)
+    const classifiedResult = this.classifyTidalTrends(ganhaiDataArray);
+    console.log('分类赶海时间 ',classifiedResult)
+    const processedResult = this.processClassifiedResult(classifiedResult);
+    console.log('格式化赶海时间 ',processedResult)
 
+    const ganhaiTime1 = processedResult.inclued_5 
+    const ganhaiTime2 = processedResult.inclued_10
+    const ganhaiTime3 = processedResult.inclued_15
     const ganhaiArray = []
+
     if (ganhaiTime1.length > 0) {
       let timeStr = ganhaiTime1.join(', ')
-      timeStr = `${timeStr}（赶海指数：优，潮高低于0.5米）`
+      timeStr = `${timeStr}（赶海指数：优，最低潮小于0.5米）`
       ganhaiArray.push(timeStr)
     }
-    if (ganhaiArray.length == 0 && ganhaiTime2.length > 0) {
+    if (ganhaiTime2.length > 0) {
       let timeStr = ganhaiTime2.join(', ')
-      timeStr = `${timeStr}（赶海指数：良，潮高低于1米）`
+      timeStr = `${timeStr}（赶海指数：良，最低潮小于1米）`
       ganhaiArray.push(timeStr)
     }
-    if (ganhaiArray.length == 0 && ganhaiTime3.length > 0) {
+    if (ganhaiTime3.length > 0) {
       let timeStr = ganhaiTime3.join(', ')
-      timeStr = `${timeStr}（赶海指数：中，潮高低于1.5米）`
+      timeStr = `${timeStr}（赶海指数：中，最低潮小于1.5米）`
       ganhaiArray.push(timeStr)
     }
     if (ganhaiArray.length == 0) {
-      ganhaiArray.push("赶海指数：差，潮高大于1.5米，不宜赶海")
+      ganhaiArray.push("赶海指数：差，潮位较高，不宜赶海")
     }
-    console.log('赶海时间：', ganhaiArray)
-
     this.setData({
       ganhaiDataArray: ganhaiArray
     })
+
     const formattedDate = this.data.selectedDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
 
     var option = {
@@ -465,52 +471,130 @@ Page({
     }
   },
 
-  findTidePeriodsBelowThreshold(hourlyArray, threshold) {
-    let periods = [];
-    let start = null; // 用于标记开始时间
-    let isDescending = false; // 标记是否在下降趋势中
-
-    for (let i = 1; i < hourlyArray.length; i++) { // 从第2个数据点开始（索引1）
-      let currentTide = hourlyArray[i]; // 获取当前小时的潮位
-      let previousTide = hourlyArray[i - 1]; // 获取前一个小时的潮位
-      let currentTime = `${i.toString().padStart(2, '0')}:00`; // 格式化当前时间字符串
-      let previousTime = `${(i - 1).toString().padStart(2, '0')}:00`; // 前一个小时的时间
-
-      // 判断潮汐是否低于阈值并且处于下降趋势
-      if (currentTide < threshold && currentTide < previousTide) {
-        if (start === null) { // 如果没有开始时间，说明找到了下降趋势的开始
-          start = currentTime;
-          isDescending = true;
-        }
-      } else if (currentTide >= threshold || currentTide > previousTide) {
-        // 如果潮位大于等于阈值或潮位上升，并且之前有下降趋势，说明找到了时间段的结束
-        if (start !== null && isDescending) {
-          // 如果开始和结束时间相同，取前一个小时作为结束时间
-          if (start === previousTime) {
-            periods.push(`${(i - 2).toString().padStart(2, '0')}:00-${previousTime}`);
-          } else {
-            periods.push(`${start}-${previousTime}`);
-          }
-          start = null; // 重置开始时间
-          isDescending = false; // 重置下降趋势标记
-        }
+  classifyTidalTrends(tidalTrends) {
+    const result = {
+      inclued_15: [],
+      inclued_10: [],
+      inclued_5: []
+    };
+  
+    tidalTrends.forEach(item => {
+      const minTidalValue = Math.min(...item.trend);  // 获取该趋势的最小潮汐值
+  
+      // 分类处理区间
+      if (minTidalValue >= 1 && minTidalValue < 1.5) {
+        result.inclued_15.push(item.section);  // 将区间添加到 inclued_15 中
+      } else if (minTidalValue >= 0.5 && minTidalValue < 1) {
+        result.inclued_10.push(item.section);  // 将区间添加到 inclued_10 中
+      } else if (minTidalValue < 0.5) {
+        result.inclued_5.push(item.section);   // 将区间添加到 inclued_5 中
       }
-    }
-
-    // 处理最后一段，如果仍然处于下降趋势并且结束时间未设置
-    if (start !== null && isDescending) {
-      let lastHour = (hourlyArray.length - 1).toString().padStart(2, '0') + ':00';
-      if (start !== lastHour) {
-        // 如果最后一个时间段的开始和结束时间不相同，正常返回
-        periods.push(`${start}-${lastHour}`);
-      } else {
-        // 如果最后一段时间段的开始时间和结束时间相同，取前一个小时
-        periods.push(`${(hourlyArray.length - 2).toString().padStart(2, '0')}:00-${lastHour}`);
-      }
-    }
-
-    return periods;
+    });
+  
+    // 确保每个字段始终是数组，如果没有符合的区间，数组为[]
+    if (result.inclued_15.length === 0) result.inclued_15 = [];
+    if (result.inclued_10.length === 0) result.inclued_10 = [];
+    if (result.inclued_5.length === 0) result.inclued_5 = [];
+  
+    return result;
   },
+
+  findTidalTrends(array) {
+    const result = [];
+    let trend = [];
+    let startIndex = -1;
+  
+    // 遍历所有潮汐高度数据
+    for (let i = 0; i < array.length; i++) {
+      const current = array[i];
+  
+      // 判断是否满足潮汐小于1.5并且是下降趋势
+      if (current < 1.6) {
+        if (trend.length === 0) {
+          // 开始一个新的下降趋势区间
+          trend.push(current);
+          startIndex = i;
+        } else {
+          const last = trend[trend.length - 1];
+          // 如果是下降趋势，则加入当前值
+          if (current < last) {
+            trend.push(current);
+          } else {
+            // 一旦出现上升，停止记录当前趋势
+            if (trend.length > 1) {
+              // 完成一个下降趋势区间
+              result.push({
+                trend: [...trend],
+                section: [startIndex, i - 1]
+              });
+            }
+            // 清空趋势，开始新的检查
+            trend = [];
+            startIndex = -1;
+          }
+        }
+      } else {
+        // 潮汐高度大于等于1.5，结束当前下降趋势
+        if (trend.length > 1) {
+          result.push({
+            trend: [...trend],
+            section: [startIndex, i - 1]
+          });
+        }
+        trend = [];
+        startIndex = -1;
+      }
+    }
+  
+    // 如果有剩余的下降趋势，最后需要保存
+    if (trend.length > 1) {
+      result.push({
+        trend: [...trend],
+        section: [startIndex, array.length - 1]
+      });
+    }
+  
+    return result;
+  },
+
+  // 将小时索引转为对应的时间字符串（例如6 -> "06:00"）
+formatTimeRange(startIndex, endIndex) {
+  const startTime = startIndex < 10 ? `0${startIndex}:00` : `${startIndex}:00`;
+  const endTime = endIndex < 10 ? `0${endIndex}:00` : `${endIndex}:00`;
+  return `${startTime}-${endTime}`;
+},
+
+// 对 classifiedResult 进行处理，转换为时间字符串
+processClassifiedResult(classifiedResult) {
+  const resultWithTime = {
+    inclued_15: [],
+    inclued_10: [],
+    inclued_5: [],
+  };
+
+  // 处理 inclued_15 数组
+  for (let i = 0; i < classifiedResult.inclued_15.length; i++) {
+    const range = classifiedResult.inclued_15[i];
+    resultWithTime.inclued_15.push(this.formatTimeRange(range[0], range[1]));
+  }
+
+  // 处理 inclued_10 数组
+  for (let i = 0; i < classifiedResult.inclued_10.length; i++) {
+    const range = classifiedResult.inclued_10[i];
+    resultWithTime.inclued_10.push(this.formatTimeRange(range[0], range[1]));
+  }
+
+  // 处理 inclued_5 数组
+  for (let i = 0; i < classifiedResult.inclued_5.length; i++) {
+    const range = classifiedResult.inclued_5[i];
+    if (range.length > 0) {
+      resultWithTime.inclued_5.push(this.formatTimeRange(range[0], range[1]));
+    }
+  }
+
+  return resultWithTime;
+},
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
