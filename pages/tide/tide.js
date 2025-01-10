@@ -508,8 +508,9 @@ Page({
     for (let i = 0; i < array.length; i++) {
       const current = array[i];
   
-      // 判断是否满足潮汐小于1.5并且是下降趋势
-      if (current < 1.6) {
+      // 判断是否满足潮汐小于2并且是下降趋势
+      if (current < 2) {
+        // debugger
         if (trend.length === 0) {
           // 开始一个新的下降趋势区间
           trend.push(current);
@@ -517,16 +518,24 @@ Page({
         } else {
           const last = trend[trend.length - 1];
           // 如果是下降趋势，则加入当前值
-          if (current < last) {
+          if (current <= last) {
             trend.push(current);
           } else {
             // 一旦出现上升，停止记录当前趋势
             if (trend.length > 1) {
               // 完成一个下降趋势区间
+             if (startIndex > 0 && startIndex == i - 1) {
+               //下降趋势只有一个点，取前一个点至当前点
+               result.push({
+                trend: [...trend],
+                section: [startIndex-1, startIndex]
+              });
+             } else {
               result.push({
                 trend: [...trend],
                 section: [startIndex, i - 1]
               });
+             }
             }
             // 清空趋势，开始新的检查
             trend = [];
@@ -536,10 +545,18 @@ Page({
       } else {
         // 潮汐高度大于等于1.5，结束当前下降趋势
         if (trend.length > 1) {
-          result.push({
-            trend: [...trend],
-            section: [startIndex, i - 1]
-          });
+          if (startIndex > 0 && startIndex == i - 1) {
+            //下降趋势只有一个点，取前一个点至当前点
+            result.push({
+             trend: [...trend],
+             section: [startIndex-1, startIndex]
+           });
+          } else {
+           result.push({
+             trend: [...trend],
+             section: [startIndex, i - 1]
+           });
+          }
         }
         trend = [];
         startIndex = -1;
