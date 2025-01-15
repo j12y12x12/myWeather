@@ -58,7 +58,9 @@
           <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
           <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
           <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
-          <text>{{item.textNight}}</text>
+          <text style="margin-bottom: 10rpx;">{{item.textNight}}</text>
+          <text style="margin-bottom: 10rpx;font-size: 13px;">{{item.windDirDay}}</text>
+          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{ item.windScaleDay + "级"}}</text>
         </view>
       </view>
     </scroll-view>
@@ -74,7 +76,9 @@
           <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
           <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
           <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
-          <text>{{item.textNight}}</text>
+          <text style="margin-bottom: 10rpx;">{{item.textNight}}</text>
+          <text style="margin-bottom: 10rpx;font-size: 13px;">{{item.windDirDay}}</text>
+          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{ item.windScaleDay + "级"}}</text>
         </view>
       </view>
     </scroll-view>

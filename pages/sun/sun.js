@@ -57,7 +57,7 @@ Page({
     });
 
     // 生成今天及以后的 10 天
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 30; i++) {
       let date = new Date(currentDate);
       date.setDate(currentDate.getDate() + i); // 根据偏移量计算日期
       let dateString = this.formatDate(date);
