@@ -8,6 +8,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "日出页",
+          "pathName": "pages/sun/sun",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "潮汐页",
           "pathName": "pages/tide/tide",
           "query": "",

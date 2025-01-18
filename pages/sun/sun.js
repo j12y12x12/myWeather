@@ -31,15 +31,72 @@ Page({
       key: 'locationData',
       success(res) {
         console.log('页面A的数据:', res.data);
-        that.setData({
-          address: res.data.address,
-          latitude: res.data.latitude,
-          longitude: res.data.longitude,
-        })
-        that.getSunData(that.data.selectedDate, res.data.longitude, res.data.latitude)
+
+        if (res.data.address.length > 0) {
+          that.setData({
+            address: res.data.address,
+            latitude: res.data.latitude,
+            longitude: res.data.longitude,
+          })
+          that.getSunData()
+        } else {
+          console.log('未缓存位置信息')
+          that.getUserLocation()
+        }
+      },
+      fail(error) {
+        console.log('未缓存位置信息: ',error)
+        that.getUserLocation()
       }
     });
   },
+
+    // 获取位置信息
+    getUserLocation() {
+
+      const that = this
+      wx.getLocation({
+        type: 'gcj02',
+        isHighAccuracy: true, // 开启高精度
+        success(res) {
+          const latitude = res.latitude
+          const longitude = res.longitude
+          console.log('位置信息  ', res);
+          that.setData({
+            latitude: res.latitude,
+            longitude: res.longitude,
+          })
+          that.getSunData()
+          that.fetchAddress(longitude, latitude)
+        },
+        fail(res) {
+          wx.showToast({
+            title: '获取位置信息失败',
+            icon: 'none',
+          })
+          console.log('位置信息失败  ', res);
+        }
+      })
+    },
+  
+    fetchAddress(lon, lat) {
+      const that = this
+      util.fetchAddress(lon, lat,
+        function (data) {
+          // 成功回调，打印返回数据
+          that.setData({
+            address: data,
+          })
+        },
+        function (errorMessage) {
+          // 错误回调，打印错误信息
+          console.error('请求失败:', errorMessage);
+          wx.showToast({
+            title: '地址解析失败',
+            icon: 'none',
+          })
+        });
+    },
 
   // 生成今天及以后的十天的数据
   generateTabData: function () {
@@ -120,7 +177,7 @@ Page({
       tabData: tabData
     });
 
-    this.getSunData(this.data.selectedDate, this.data.longitude, this.data.latitude)
+    this.getSunData()
 
   },
 
@@ -139,7 +196,7 @@ Page({
           longitude: res.longitude,
           address: res?.address || '这是哪里？',
         })
-        that.getSunData(that.data.selectedDate, res.longitude, res.latitude)
+        that.getSunData()
       },
       fail: function () {},
       complete: function () {}
@@ -147,8 +204,19 @@ Page({
   },
 
   // 获取日出日落数据
-  getSunData(date, lon, lat) {
+  getSunData() {
 
+    const date = this.data.selectedDate
+    const lon = this.data.longitude
+    const lat = this.data.latitude
+
+    if (!lon || !lat) {
+      wx.showToast({
+        title: '未获取到位置信息',
+        icon: 'none',
+      })
+      return
+    }
     // 请求接口的URL
     const url = 'https://api.qweather.com/v7/astronomy/sun'
     // 请求参数

@@ -55,10 +55,65 @@ const formatWeekDate = (dateStr) => {
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   }
 
+  var qqmapsdk;
+  const qqmapKey = 'XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
+  var QQMapWX = require('../utils/libs/qqmap/qqmap-wx-jssdk.js');
+
+// 经纬度逆解析地址
+  const fetchAddress = (lon, lat,successCallback, errorCallback) => {
+    if (!qqmapsdk) {
+      qqmapsdk = new QQMapWX({
+        key: qqmapKey
+      });
+    }
+    qqmapsdk.reverseGeocoder({
+      location: {
+        latitude: lat,
+        longitude: lon
+      },
+      success: function (res1) {
+        const address = res1.result.address_component
+        let addressDetail = ''
+        if (address.city && address.district) {
+          addressDetail = address.street ? `${address.city} ${address.district} ${address.street}` : `${address.city} ${address.district}`
+        } else {
+          addressDetail = '这是哪里？'
+        }
+        successCallback(addressDetail);
+
+        // that.setData({
+        //   address: addressDetail,
+        // })
+        // wx.setStorage({
+        //   key: 'locationData',
+        //   data: {
+        //     address: addressDetail,
+        //     latitude: lat,
+        //     longitude: lon
+        //   }
+        // });
+
+      },
+      fail: function (error) {
+
+        errorCallback(`请求失败：${error.errMsg}`);
+        // wx.hideLoading();
+        // that.setData({
+        //   "isLoading": false,
+        // })
+        // wx.showToast({
+        //   title: '地址解析失败',
+        //   icon: 'none',
+        // })
+      }
+    })
+  }
+
 module.exports = {
   formatTime,
   getCurrentDate,
   getCurrentDateLong,
   formatWeekDate,
-  formatHourTime
+  formatHourTime,
+  fetchAddress
 }

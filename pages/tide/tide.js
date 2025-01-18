@@ -43,56 +43,125 @@ Page({
       key: 'locationData',
       success(res) {
         console.log('页面A的数据:', res.data);
-        that.setData({
-          address: res.data.address,
-          latitude: res.data.latitude,
-          longitude: res.data.longitude,
-        })
-        that.fetchPoiData(res.data.longitude, res.data.latitude,
-          function (data) {
-            // 成功回调，打印返回数据
-            if (data.code == 200) {
-              that.getTideData(that.data.selectedDate, data.poi[0].id)
-              that.setData({
-                poiId: data.poi[0].id,
-              })
-            } else {
-              wx.showToast({
-                title: '未查询到潮汐数据',
-                icon: 'none',
-              })
-            }
-            console.log('请求成功，返回的数据:', data);
-          },
-          function (errorMessage) {
-            // 错误回调，打印错误信息
-            console.error('请求失败:', errorMessage);
-          });
+
+        if (res.data.address.length > 0) {
+          that.setData({
+            address: res.data.address,
+            latitude: res.data.latitude,
+            longitude: res.data.longitude,
+          })
+          that.fetchData()
+        } else {
+          console.log('未缓存位置信息')
+          that.getUserLocation()
+        }
+      },
+      fail(error) {
+        console.log('未缓存位置信息: ',error)
+        that.getUserLocation()
       }
     });
 
     // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
-// 在页面中定义插屏广告
-let interstitialAd = null
+    // 在页面中定义插屏广告
+    let interstitialAd = null
 
-// 在页面onLoad回调事件中创建插屏广告实例
-if (wx.createInterstitialAd) {
-  interstitialAd = wx.createInterstitialAd({
-    adUnitId: 'adunit-4ebe927a5bc6e9d4'
-  })
-  interstitialAd.onLoad(() => {})
-  interstitialAd.onError((err) => {
-    console.error('插屏广告加载失败', err)
-  })
-  interstitialAd.onClose(() => {})
-}
+    // 在页面onLoad回调事件中创建插屏广告实例
+    if (wx.createInterstitialAd) {
+      interstitialAd = wx.createInterstitialAd({
+        adUnitId: 'adunit-4ebe927a5bc6e9d4'
+      })
+      interstitialAd.onLoad(() => {})
+      interstitialAd.onError((err) => {
+        console.error('插屏广告加载失败', err)
+      })
+      interstitialAd.onClose(() => {})
+    }
 
-// 在适合的场景显示插屏广告
-if (interstitialAd) {
-  interstitialAd.show().catch((err) => {
-    console.error('插屏广告显示失败', err)
-  })
-}
+    // 在适合的场景显示插屏广告
+    if (interstitialAd) {
+      interstitialAd.show().catch((err) => {
+        console.error('插屏广告显示失败', err)
+      })
+    }
+  },
+
+  fetchData() {
+    const that = this
+    if (!this.data.longitude || !this.data.latitude) {
+      wx.showToast({
+        title: '未获取到位置信息',
+        icon: 'none',
+      })
+      return
+    }
+    this.fetchPoiData(this.data.longitude, this.data.latitude,
+      function (data) {
+        // 成功回调，打印返回数据
+        if (data.code == 200) {
+          that.getTideData(that.data.selectedDate, data.poi[0].id)
+          that.setData({
+            poiId: data.poi[0].id,
+          })
+        } else {
+          wx.showToast({
+            title: '未查询到潮汐数据',
+            icon: 'none',
+          })
+        }
+        console.log('请求成功，返回的数据:', data);
+      },
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.error('请求失败:', errorMessage);
+      });
+  },
+
+  // 获取位置信息
+  getUserLocation() {
+
+    const that = this
+    wx.getLocation({
+      type: 'gcj02',
+      isHighAccuracy: true, // 开启高精度
+      success(res) {
+        const latitude = res.latitude
+        const longitude = res.longitude
+        console.log('位置信息  ', res);
+        that.setData({
+          latitude: res.latitude,
+          longitude: res.longitude,
+        })
+        that.fetchData()
+        that.fetchAddress(longitude, latitude)
+      },
+      fail(res) {
+        wx.showToast({
+          title: '获取位置信息失败',
+          icon: 'none',
+        })
+        console.log('位置信息失败  ', res);
+      }
+    })
+  },
+
+  fetchAddress(lon, lat) {
+    const that = this
+    util.fetchAddress(lon, lat,
+      function (data) {
+        // 成功回调，打印返回数据
+        that.setData({
+          address: data,
+        })
+      },
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.error('请求失败:', errorMessage);
+        wx.showToast({
+          title: '地址解析失败',
+          icon: 'none',
+        })
+      });
   },
 
   // 生成今天及以后的十天的数据
@@ -170,6 +239,13 @@ if (interstitialAd) {
       tabData: tabData
     });
 
+    if (!this.data.latitude.length || !this.data.longitude.length) {
+      wx.showToast({
+        title: '未获取到位置信息',
+        icon: 'none',
+      })
+      return
+    }
     if (this.data.poiId.length == 0) {
 
       wx.showToast({
@@ -258,7 +334,7 @@ if (interstitialAd) {
           const tideTableArray = res.data.tideTable
 
           const changedTideTable = that.changeTideTable(tideTableArray)
-          console.log('满潮信息  ',changedTideTable)
+          console.log('满潮信息  ', changedTideTable)
           that.setData({
             tideHourData: tideHourlys,
             tideTableData: changedTideTable
@@ -358,6 +434,7 @@ if (interstitialAd) {
       complete: function () {}
     })
   },
+  
 
   showEcharts() {
     this.echartsComponnet = this.selectComponent('#tide-dom-bar');
@@ -406,13 +483,13 @@ if (interstitialAd) {
     xAxisData[maxIndex] = `${maxIndex < 10 ? '0' : ''}${maxIndex}:00`;
 
     const ganhaiDataArray = this.findTidalTrends(hourlyArray)
-    console.log('合适赶海时间 ',ganhaiDataArray)
+    console.log('合适赶海时间 ', ganhaiDataArray)
     const classifiedResult = this.classifyTidalTrends(ganhaiDataArray);
-    console.log('分类赶海时间 ',classifiedResult)
+    console.log('分类赶海时间 ', classifiedResult)
     const processedResult = this.processClassifiedResult(classifiedResult);
-    console.log('格式化赶海时间 ',processedResult)
+    console.log('格式化赶海时间 ', processedResult)
 
-    const ganhaiTime1 = processedResult.inclued_5 
+    const ganhaiTime1 = processedResult.inclued_5
     const ganhaiTime2 = processedResult.inclued_10
     const ganhaiTime3 = processedResult.inclued_15
     const ganhaiArray = []
@@ -500,25 +577,25 @@ if (interstitialAd) {
       inclued_10: [],
       inclued_5: []
     };
-  
+
     tidalTrends.forEach(item => {
-      const minTidalValue = Math.min(...item.trend);  // 获取该趋势的最小潮汐值
-  
+      const minTidalValue = Math.min(...item.trend); // 获取该趋势的最小潮汐值
+
       // 分类处理区间
       if (minTidalValue >= 1 && minTidalValue < 1.5) {
-        result.inclued_15.push(item.section);  // 将区间添加到 inclued_15 中
+        result.inclued_15.push(item.section); // 将区间添加到 inclued_15 中
       } else if (minTidalValue >= 0.5 && minTidalValue < 1) {
-        result.inclued_10.push(item.section);  // 将区间添加到 inclued_10 中
+        result.inclued_10.push(item.section); // 将区间添加到 inclued_10 中
       } else if (minTidalValue < 0.5) {
-        result.inclued_5.push(item.section);   // 将区间添加到 inclued_5 中
+        result.inclued_5.push(item.section); // 将区间添加到 inclued_5 中
       }
     });
-  
+
     // 确保每个字段始终是数组，如果没有符合的区间，数组为[]
     if (result.inclued_15.length === 0) result.inclued_15 = [];
     if (result.inclued_10.length === 0) result.inclued_10 = [];
     if (result.inclued_5.length === 0) result.inclued_5 = [];
-  
+
     return result;
   },
 
@@ -526,11 +603,11 @@ if (interstitialAd) {
     const result = [];
     let trend = [];
     let startIndex = -1;
-  
+
     // 遍历所有潮汐高度数据
     for (let i = 0; i < array.length; i++) {
       const current = array[i];
-  
+
       // 判断是否满足潮汐小于2并且是下降趋势
       if (current < 2) {
         // debugger
@@ -547,18 +624,18 @@ if (interstitialAd) {
             // 一旦出现上升，停止记录当前趋势
             if (trend.length > 1) {
               // 完成一个下降趋势区间
-             if (startIndex > 0 && startIndex == i - 1) {
-               //下降趋势只有一个点，取前一个点至当前点
-               result.push({
-                trend: [...trend],
-                section: [startIndex-1, startIndex]
-              });
-             } else {
-              result.push({
-                trend: [...trend],
-                section: [startIndex, i - 1]
-              });
-             }
+              if (startIndex > 0 && startIndex == i - 1) {
+                //下降趋势只有一个点，取前一个点至当前点
+                result.push({
+                  trend: [...trend],
+                  section: [startIndex - 1, startIndex]
+                });
+              } else {
+                result.push({
+                  trend: [...trend],
+                  section: [startIndex, i - 1]
+                });
+              }
             }
             // 清空趋势，开始新的检查
             trend = [];
@@ -571,21 +648,21 @@ if (interstitialAd) {
           if (startIndex > 0 && startIndex == i - 1) {
             //下降趋势只有一个点，取前一个点至当前点
             result.push({
-             trend: [...trend],
-             section: [startIndex-1, startIndex]
-           });
+              trend: [...trend],
+              section: [startIndex - 1, startIndex]
+            });
           } else {
-           result.push({
-             trend: [...trend],
-             section: [startIndex, i - 1]
-           });
+            result.push({
+              trend: [...trend],
+              section: [startIndex, i - 1]
+            });
           }
         }
         trend = [];
         startIndex = -1;
       }
     }
-  
+
     // 如果有剩余的下降趋势，最后需要保存
     if (trend.length > 1) {
       result.push({
@@ -593,47 +670,47 @@ if (interstitialAd) {
         section: [startIndex, array.length - 1]
       });
     }
-  
+
     return result;
   },
 
   // 将小时索引转为对应的时间字符串（例如6 -> "06:00"）
-formatTimeRange(startIndex, endIndex) {
-  const startTime = startIndex < 10 ? `0${startIndex}:00` : `${startIndex}:00`;
-  const endTime = endIndex < 10 ? `0${endIndex}:00` : `${endIndex}:00`;
-  return `${startTime}-${endTime}`;
-},
+  formatTimeRange(startIndex, endIndex) {
+    const startTime = startIndex < 10 ? `0${startIndex}:00` : `${startIndex}:00`;
+    const endTime = endIndex < 10 ? `0${endIndex}:00` : `${endIndex}:00`;
+    return `${startTime}-${endTime}`;
+  },
 
-// 对 classifiedResult 进行处理，转换为时间字符串
-processClassifiedResult(classifiedResult) {
-  const resultWithTime = {
-    inclued_15: [],
-    inclued_10: [],
-    inclued_5: [],
-  };
+  // 对 classifiedResult 进行处理，转换为时间字符串
+  processClassifiedResult(classifiedResult) {
+    const resultWithTime = {
+      inclued_15: [],
+      inclued_10: [],
+      inclued_5: [],
+    };
 
-  // 处理 inclued_15 数组
-  for (let i = 0; i < classifiedResult.inclued_15.length; i++) {
-    const range = classifiedResult.inclued_15[i];
-    resultWithTime.inclued_15.push(this.formatTimeRange(range[0], range[1]));
-  }
-
-  // 处理 inclued_10 数组
-  for (let i = 0; i < classifiedResult.inclued_10.length; i++) {
-    const range = classifiedResult.inclued_10[i];
-    resultWithTime.inclued_10.push(this.formatTimeRange(range[0], range[1]));
-  }
-
-  // 处理 inclued_5 数组
-  for (let i = 0; i < classifiedResult.inclued_5.length; i++) {
-    const range = classifiedResult.inclued_5[i];
-    if (range.length > 0) {
-      resultWithTime.inclued_5.push(this.formatTimeRange(range[0], range[1]));
+    // 处理 inclued_15 数组
+    for (let i = 0; i < classifiedResult.inclued_15.length; i++) {
+      const range = classifiedResult.inclued_15[i];
+      resultWithTime.inclued_15.push(this.formatTimeRange(range[0], range[1]));
     }
-  }
 
-  return resultWithTime;
-},
+    // 处理 inclued_10 数组
+    for (let i = 0; i < classifiedResult.inclued_10.length; i++) {
+      const range = classifiedResult.inclued_10[i];
+      resultWithTime.inclued_10.push(this.formatTimeRange(range[0], range[1]));
+    }
+
+    // 处理 inclued_5 数组
+    for (let i = 0; i < classifiedResult.inclued_5.length; i++) {
+      const range = classifiedResult.inclued_5[i];
+      if (range.length > 0) {
+        resultWithTime.inclued_5.push(this.formatTimeRange(range[0], range[1]));
+      }
+    }
+
+    return resultWithTime;
+  },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
@@ -683,8 +760,8 @@ processClassifiedResult(classifiedResult) {
   onShareAppMessage() {
 
   },
-   // 分享给朋友
-   onShareAppMessage() {
+  // 分享给朋友
+  onShareAppMessage() {
 
   },
   // 分享到朋友圈

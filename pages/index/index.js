@@ -1,11 +1,8 @@
 // index.js
 const chooseLocation = requirePlugin('chooseLocation');
 const util = require('../../utils/util.js')
-var QQMapWX = require('../../utils/libs/qqmap/qqmap-wx-jssdk.js');
 import * as echarts from '../../ec-canvas/echarts.min';
-const qqmapKey = 'XHPBZ-S7CWW-VYQRA-YJIOI-QDZOT-EAFJL'
 
-var qqmapsdk;
 let chart = null;
 // 免费key
 const free_weather_key = '46dc1503ca4b4b189c88ac475ce69b1f'
@@ -57,10 +54,6 @@ Page({
   //   // console.log('选择的地点  ',location);
   // },
   onLoad: function () {
-    // 实例化API核心类
-    qqmapsdk = new QQMapWX({
-      key: qqmapKey
-    });
     this.setData({
       "isLoading": true,
     })
@@ -162,26 +155,16 @@ Page({
   },
   fetchAddress(lon, lat) {
     const that = this
-    qqmapsdk.reverseGeocoder({
-      location: {
-        latitude: lat,
-        longitude: lon
-      },
-      success: function (res1) {
-        const address = res1.result.address_component
-        let addressDetail = ''
-        if (address.city && address.district) {
-          addressDetail = address.street ? `${address.city} ${address.district} ${address.street}` : `${address.city} ${address.district}`
-        } else {
-          addressDetail = '这是哪里？'
-        }
+    util.fetchAddress(lon, lat,
+      function (data) {
+        // 成功回调，打印返回数据
         that.setData({
-          address: addressDetail,
+          address: data,
         })
         wx.setStorage({
           key: 'locationData',
           data: {
-            address: addressDetail,
+            address: data,
             latitude: lat,
             longitude: lon
           }
@@ -191,7 +174,9 @@ Page({
           "isLoading": false,
         })
       },
-      fail: function (res) {
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.error('请求失败:', errorMessage);
         wx.hideLoading();
         that.setData({
           "isLoading": false,
@@ -200,8 +185,7 @@ Page({
           title: '地址解析失败',
           icon: 'none',
         })
-      }
-    })
+      });
   },
   // 近两小时天气
   fetchMinuteWeather(lon, lat) {
