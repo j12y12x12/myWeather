@@ -254,5 +254,13 @@ Page({
    */
   onShareAppMessage() {
 
-  }
+  },
+   // 分享给朋友
+   onShareAppMessage() {
+
+  },
+  // 分享到朋友圈
+  onShareTimeline() {
+
+  },
 })
