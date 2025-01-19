@@ -109,11 +109,67 @@ const formatWeekDate = (dateStr) => {
     })
   }
 
+  function checkAdLimit() {
+    const currentDate = new Date();
+    const currentDateStr = currentDate.toISOString().split('T')[0]; // 获取当前日期（格式: YYYY-MM-DD）
+  
+    // 获取存储的观看记录
+    let showAdData = wx.getStorageSync('showAdData') || {};
+    console.log('广告data ',showAdData)
+
+    // 判断是否是今天的数据，如果不是，则重置次数
+    if (showAdData.day && showAdData.day !== currentDateStr) {
+      showAdData.count = 0;
+      showAdData.lastTime = 0;
+      wx.removeStorageSync('showAdData');
+    }
+  
+    // 每天观看广告次数上限
+    const maxAdCount = 7;
+    const minInterval = 30 * 1000; // 25秒
+  
+    const currentTime = currentDate.getTime();
+  
+    // 判断是否超出观看次数限制
+    if (showAdData.count >= maxAdCount) {
+      return false; // 超出次数限制，返回false
+    }
+  
+    // 判断距离上次观看广告的时间是否小于25秒
+    if (currentTime - showAdData.lastTime < minInterval) {
+      return false; // 25秒内不允许观看广告，返回false
+    }
+  
+    // 如果没有超出次数限制，并且间隔超过25秒，则允许观看广告
+    return true; // 可以观看广告，返回true
+  }
+  
+  // 在广告完成时调用，更新观看次数
+  function onAdComplete() {
+    const currentDate = new Date();
+    const currentDateStr = currentDate.toISOString().split('T')[0]; // 获取当前日期（格式: YYYY-MM-DD）
+  
+    // 获取存储的观看记录
+    let showAdData = wx.getStorageSync('showAdData') || {count:0};
+    
+    showAdData.day = currentDateStr
+    // 更新观看次数
+    showAdData.count += 1;
+    showAdData.lastTime = currentDate.getTime();
+  
+    // 更新数据
+    wx.setStorageSync('showAdData', showAdData);
+  
+    console.log("广告观看成功，观看次数更新为：" + showAdData.count);
+  }
+
 module.exports = {
   formatTime,
   getCurrentDate,
   getCurrentDateLong,
   formatWeekDate,
   formatHourTime,
-  fetchAddress
+  fetchAddress,
+  checkAdLimit,
+  onAdComplete
 }

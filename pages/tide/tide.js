@@ -5,6 +5,7 @@ const util = require('../../utils/util.js')
 // 付费key
 const charge_weather_key = '85df4159ecb14556bd88696334386822'
 let chart = null;
+let videoAd = null
 
 Page({
 
@@ -230,7 +231,7 @@ Page({
     console.log('llllllll  ',event.currentTarget)
     const that = this
     const selectIndex = event.currentTarget.dataset.index;
-    if (selectIndex >= 5) {
+    if (selectIndex >= 5 && util.checkAdLimit()) {
       wx.showToast({
         title: '完成广告即可查询',
         icon: 'none',
@@ -298,29 +299,44 @@ Page({
   showInspireAd(successCallback, unfinishCallback, errorCallback) {
     // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
     // 在页面中定义激励视频广告
-    let videoAd = null
     // 在页面onLoad回调事件中创建激励视频广告实例
     if (wx.createRewardedVideoAd) {
-      videoAd = wx.createRewardedVideoAd({
-        adUnitId: 'adunit-940259f74a6bc5d7'
-      })
+      if (!videoAd) {
+        videoAd = wx.createRewardedVideoAd({
+          adUnitId: 'adunit-940259f74a6bc5d7'
+        })
+      }
+
+      //解决多次事件回调
+      try {
+        if (videoAd.closeHandler) {
+          videoAd.offClose(videoAd.closeHandler);
+          console.log("videoAd.offClose卸载成功");
+        }
+      } catch (e) {
+        console.log("videoAd.offClose 卸载失败");
+      }
+      videoAd.closeHandler = function (res) {
+        // 用户点击了【关闭广告】按钮
+        if ((res && res.isEnded) || res === undefined) {
+          // 正常播放结束，可以下发游戏奖励
+          successCallback()
+          util.onAdComplete()
+          console.log('正常播放完成',res)
+        } else {
+          //提前关闭小程序
+          console.log('中途退出', res);
+          console.log('激励广告未完成')
+          unfinishCallback()
+        }
+      };
+
       videoAd.onLoad(() => {})
       videoAd.onError((err) => {
         console.error('激励视频光告加载失败', err)
         errorCallback()
       })
-      videoAd.onClose((res) => {
-        // 用户点击了【关闭广告】按钮
-        if (res && res.isEnded) {
-          // 正常播放结束，可以下发游戏奖励
-          console.log('激励广告完成')
-          successCallback()
-        } else {
-          console.log('激励广告未完成')
-          unfinishCallback()
-          // 播放中途退出，不下发游戏奖励
-        }
-      })
+      videoAd.onClose(videoAd.closeHandler)
     }
 
     // 用户触发广告后，显示激励视频广告
@@ -334,6 +350,8 @@ Page({
             errorCallback()
           })
       })
+    } else {
+      errorCallback()
     }
   },
 

@@ -4,6 +4,8 @@ const util = require('../../utils/util.js')
 import * as echarts from '../../ec-canvas/echarts.min';
 
 let chart = null;
+let videoAd = null
+
 // 免费key
 const free_weather_key = '46dc1503ca4b4b189c88ac475ce69b1f'
 // 付费key
@@ -67,47 +69,54 @@ Page({
 
   selectTab(event) {
     var tabId = event.currentTarget.dataset.tabId;
+    let long = this.data.location.longitude;
+    let lat = this.data.location.latitude;
+    console.log('保存的位置: ', this.data.location)
     console.log('选择tab改变  ', tabId)
     if (tabId == 2 && (this.data.isChangeLocation || this.data.thirtyDayWeathers.length == 0)) {
       // 30日天气
-      let long = this.data.location.longitude;
-      let lat = this.data.location.latitude;
-      console.log('保存的位置: ', this.data.location)
       // console.log( '保存的位置lat: ',lat)
-      wx.showToast({
-        title: '完成广告即可查询',
-        icon: 'none',
-      })
-      const that = this
-      this.showDayInspireAd( function (data) {
-        // 成功回调，打印返回数据
-        console.log('激励广告完成')
-        that.setData({
-          selectedTab: tabId,
-        })
-        that.fetchThirtyDayWeather(long, lat)
+      if (util.checkAdLimit()) {
         wx.showToast({
-          title: '免费不易，感谢支持~',
+          title: '完成广告即可查询',
           icon: 'none',
         })
-      },
-      function (unfinishMessage) {
-        // 错误回调，打印错误信息
-        console.log('激励广告未完成')
-        console.error('未完成:', unfinishMessage);
-        wx.showToast({
-          title: '未完成，无法获取奖励',
-          icon: 'none',
+        const that = this
+        this.showDayInspireAd( function (data) {
+          // 成功回调，打印返回数据
+          console.log('激励广告完成')
+          that.setData({
+            selectedTab: tabId,
+          })
+          that.fetchThirtyDayWeather(long, lat)
+          wx.showToast({
+            title: '免费不易，感谢支持~',
+            icon: 'none',
+          })
+        },
+        function (unfinishMessage) {
+          // 错误回调，打印错误信息
+          console.log('激励广告未完成')
+          console.error('未完成:', unfinishMessage);
+          wx.showToast({
+            title: '未完成，无法获取奖励',
+            icon: 'none',
+          })
+        },
+        function (errorMessage) {
+          // 错误回调，打印错误信息
+          console.error('请求失败:', errorMessage);
+          that.setData({
+            selectedTab: tabId,
+          })
+          that.fetchThirtyDayWeather(long, lat)
         })
-      },
-      function (errorMessage) {
-        // 错误回调，打印错误信息
-        console.error('请求失败:', errorMessage);
-        that.setData({
+      } else {
+        this.setData({
           selectedTab: tabId,
         })
-        that.fetchThirtyDayWeather(long, lat)
-      })
+        this.fetchThirtyDayWeather(long, lat)
+      }
       return
     }
     this.setData({
@@ -117,10 +126,6 @@ Page({
       this.setData({
         selectedTab: tabId,
       })
-      // 15日天气
-      let long = this.data.location.longitude;
-      let lat = this.data.location.latitude;
-      console.log('保存的位置: ', this.data.location)
       // console.log( '保存的位置lat: ',lat)
       this.fetchFifteenDayWeather(long, lat)
     }
@@ -129,29 +134,43 @@ Page({
   showDayInspireAd(successCallback, unfinishCallback, errorCallback) {
     // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
     // 在页面中定义激励视频广告
-    let videoAd = null
     // 在页面onLoad回调事件中创建激励视频广告实例
     if (wx.createRewardedVideoAd) {
-      videoAd = wx.createRewardedVideoAd({
-        adUnitId: 'adunit-ed7705ba4283dea7'
-      })
+      if (!videoAd) {
+        videoAd = wx.createRewardedVideoAd({
+          adUnitId: 'adunit-ed7705ba4283dea7'
+        })
+      }
+      //解决多次事件回调
+      try {
+        if (videoAd.closeHandler) {
+          videoAd.offClose(videoAd.closeHandler);
+          console.log("videoAd.offClose卸载成功");
+        }
+      } catch (e) {
+        console.log("videoAd.offClose 卸载失败");
+      }
+      videoAd.closeHandler = function (res) {
+        // 用户点击了【关闭广告】按钮
+        if ((res && res.isEnded) || res === undefined) {
+          // 正常播放结束，可以下发游戏奖励
+          successCallback()
+          util.onAdComplete()
+          console.log('正常播放完成',res)
+        } else {
+          //提前关闭小程序
+          console.log('中途退出', res);
+          console.log('激励广告未完成')
+          unfinishCallback()
+        }
+      };
+
       videoAd.onLoad(() => {})
       videoAd.onError((err) => {
         console.error('激励视频光告加载失败', err)
         errorCallback()
       })
-      videoAd.onClose((res) => {
-        // 用户点击了【关闭广告】按钮
-        if (res && res.isEnded) {
-          // 正常播放结束，可以下发游戏奖励
-          console.log('激励广告完成')
-          successCallback()
-        } else {
-          console.log('激励广告未完成')
-          unfinishCallback()
-          // 播放中途退出，不下发游戏奖励
-        }
-      })
+      videoAd.onClose(videoAd.closeHandler)
     }
 
     // 用户触发广告后，显示激励视频广告
@@ -165,6 +184,8 @@ Page({
             errorCallback()
           })
       })
+    } else {
+      errorCallback()
     }
   },
   // 获取位置信息
