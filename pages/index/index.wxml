@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="all-container">
   <view class="background-fixed"></view>
-  <almanac date="{{ currentDay }}"  wx:if="{{currentDay.length > 0}}"></almanac>
+  <almanac date="{{ currentDay }}" wx:if="{{currentDay.length > 0}}"></almanac>
   <scroll-view class="scrollarea" scroll-y type="list">
     <view class="location-txt">
       <text class="location-value" wx:if="!isLoading">{{ isLoading?'获取位置中...': (address || '未获取到位置信息')}}</text>
@@ -17,71 +17,47 @@
       </view>
     </view>
     <view class="wather-detail" wx:if="{{dayWeather.windDir}}">
-    <view class="detail-item">
-    <text class="datail-value">{{dayWeather.windDir + dayWeather.windScale + '级' }}</text>
-    <text class="datail-title">风力</text>
-    </view>
-    <view class="detail-item">
-    <text class="datail-value">{{dayWeather.windSpeed + 'km/h'}}</text>
-    <text class="datail-title">风速</text>
-    </view>
-    <view class="detail-item">
-    <text class="datail-value">{{dayWeather.humidity + '%'}}</text>
-    <text class="datail-title">湿度</text>
-    </view>
-    <view class="detail-item">
-    <text class="datail-value">{{dayWeather.precip + 'mm'}}</text>
-    <text class="datail-title">降水量</text>
-    </view>
+      <view class="detail-item">
+        <text class="datail-value">{{dayWeather.windDir + dayWeather.windScale + '级' }}</text>
+        <text class="datail-title">风力</text>
+      </view>
+      <view class="detail-item">
+        <text class="datail-value">{{dayWeather.windSpeed + 'km/h'}}</text>
+        <text class="datail-title">风速</text>
+      </view>
+      <view class="detail-item">
+        <text class="datail-value">{{dayWeather.humidity + '%'}}</text>
+        <text class="datail-title">湿度</text>
+      </view>
+      <view class="detail-item">
+        <text class="datail-value">{{dayWeather.precip + 'mm'}}</text>
+        <text class="datail-title">降水量</text>
+      </view>
     </view>
     <view class="minutes-weather">
       <ec-canvas class="mychart" id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}">
       </ec-canvas>
     </view>
     <view class="selected-tab" wx:if="{{sevenDayWeathers.length > 0}}">
-    <view class="chose-tab {{selectedTab == 0 ? 'tab-active' : ''}}" data-tab-id="0" bind:tap="selectTab">
+      <view class="chose-tab {{selectedTab == 0 ? 'tab-active' : ''}}" data-tab-id="0" bind:tap="selectTab">
         7日
-    </view>
-    <view class="chose-tab {{selectedTab == 1 ? 'tab-active' : ''}}" data-tab-id="1" bind:tap="selectTab">
+      </view>
+      <view class="chose-tab {{selectedTab == 1 ? 'tab-active' : ''}}" data-tab-id="1" bind:tap="selectTab">
+        15日
+      </view>
+      <view class="chose-tab {{selectedTab == 2 ? 'tab-active' : ''}}" data-tab-id="2" bind:tap="selectTab">
         30日
-    </view>
-    </view>
-
-<!-- 7日天气-->
-    <scroll-view  wx:if="{{selectedTab == 0}}" class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
-      <view class="day-weather-show-wrapper">
-        <view wx:for="{{sevenDayWeathers}}" wx:key="index" class="day-weather-show">
-          <text class="day-weather-date">{{item.isToday?'今天': item.showDate}}</text>
-          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{item.weekStr}}</text>
-          <text class="day-weather-day-text">{{item.textDay}}</text>
-          <image class="day-weather-img" src="{{item.iconDayUrl}}" mode="aspectFit" style="margin-bottom: 20rpx;"></image>
-          <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
-          <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
-          <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
-          <text class="day-weather-day-text">{{item.textNight}}</text>
-          <text style="margin-bottom: 10rpx;font-size: 13px;">{{item.windDirDay}}</text>
-          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{ item.windScaleDay + "级"}}</text>
-        </view>
       </view>
-    </scroll-view>
+    </view>
 
+    <!-- 7日天气-->
+    <dayWeather wx:if="{{selectedTab == 0}}" dayWeathers="{{sevenDayWeathers}}"></dayWeather>
+    <!-- 15日天气-->
+    <dayWeather wx:if="{{selectedTab == 1}}" dayWeathers="{{fifteenDayWeathers}}"></dayWeather>
     <!-- 30日天气-->
-    <scroll-view  wx:if="{{selectedTab == 1}}" class="seven-day-weather" scroll-x="true" style="white-space: nowrap;">
-      <view class="day-weather-show-wrapper">
-        <view wx:for="{{thirtyDayWeathers}}" wx:key="index" class="day-weather-show">
-          <text class="day-weather-date">{{item.isToday?'今天': item.showDate}}</text>
-          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{item.weekStr}}</text>
-          <text class="day-weather-day-text">{{item.textDay}}</text>
-          <image class="day-weather-img" src="{{item.iconDayUrl}}" mode="aspectFit" style="margin-bottom: 20rpx;"></image>
-          <text style="margin-bottom: 50rpx;">{{item.tempMax + '°'}}</text>
-          <text style="margin-bottom: 20rpx;">{{item.tempMin + '°'}}</text>
-          <image style="margin-bottom: 20rpx;" class="day-weather-img" src="{{item.iconNightUrl}}" mode="aspectFit"></image>
-          <text class="day-weather-day-text">{{item.textNight}}</text>
-          <text style="margin-bottom: 10rpx;font-size: 13px;">{{item.windDirDay}}</text>
-          <text style="margin-bottom: 20rpx; font-size: 12px; color: #777777;">{{ item.windScaleDay + "级"}}</text>
-        </view>
-      </view>
-    </scroll-view>
+    <dayWeather wx:if="{{selectedTab == 2}}" dayWeathers="{{thirtyDayWeathers}}"></dayWeather>
+
+
   </scroll-view>
   <moreservice wx:if="{{location.longitude > 0}}"></moreservice>
 </view>

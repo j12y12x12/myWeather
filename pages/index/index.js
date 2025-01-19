@@ -26,6 +26,7 @@ Page({
     isChangeLocation: false,
     dayWeather: {},
     sevenDayWeathers: [],
+    fifteenDayWeathers: [],
     thirtyDayWeathers: [],
     hourWeather: {},
     dayImage: '',
@@ -67,16 +68,103 @@ Page({
   selectTab(event) {
     var tabId = event.currentTarget.dataset.tabId;
     console.log('选择tab改变  ', tabId)
-    this.setData({
-      selectedTab: tabId,
-    })
-    if (tabId == 1 && (this.data.isChangeLocation || this.data.thirtyDayWeathers.length == 0)) {
+    if (tabId == 2 && (this.data.isChangeLocation || this.data.thirtyDayWeathers.length == 0)) {
       // 30日天气
       let long = this.data.location.longitude;
       let lat = this.data.location.latitude;
       console.log('保存的位置: ', this.data.location)
       // console.log( '保存的位置lat: ',lat)
-      this.fetchThirtyDayWeather(long, lat)
+      wx.showToast({
+        title: '完成广告即可查询',
+        icon: 'none',
+      })
+      const that = this
+      this.showDayInspireAd( function (data) {
+        // 成功回调，打印返回数据
+        console.log('激励广告完成')
+        that.setData({
+          selectedTab: tabId,
+        })
+        that.fetchThirtyDayWeather(long, lat)
+        wx.showToast({
+          title: '免费不易，感谢支持~',
+          icon: 'none',
+        })
+      },
+      function (unfinishMessage) {
+        // 错误回调，打印错误信息
+        console.log('激励广告未完成')
+        console.error('未完成:', unfinishMessage);
+        wx.showToast({
+          title: '未完成，无法获取奖励',
+          icon: 'none',
+        })
+      },
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.error('请求失败:', errorMessage);
+        that.setData({
+          selectedTab: tabId,
+        })
+        that.fetchThirtyDayWeather(long, lat)
+      })
+      return
+    }
+    this.setData({
+      selectedTab: tabId,
+    })
+    if (tabId == 1 && (this.data.isChangeLocation || this.data.fifteenDayWeathers.length == 0)) {
+      this.setData({
+        selectedTab: tabId,
+      })
+      // 15日天气
+      let long = this.data.location.longitude;
+      let lat = this.data.location.latitude;
+      console.log('保存的位置: ', this.data.location)
+      // console.log( '保存的位置lat: ',lat)
+      this.fetchFifteenDayWeather(long, lat)
+    }
+  },
+
+  showDayInspireAd(successCallback, unfinishCallback, errorCallback) {
+    // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
+    // 在页面中定义激励视频广告
+    let videoAd = null
+    // 在页面onLoad回调事件中创建激励视频广告实例
+    if (wx.createRewardedVideoAd) {
+      videoAd = wx.createRewardedVideoAd({
+        adUnitId: 'adunit-ed7705ba4283dea7'
+      })
+      videoAd.onLoad(() => {})
+      videoAd.onError((err) => {
+        console.error('激励视频光告加载失败', err)
+        errorCallback()
+      })
+      videoAd.onClose((res) => {
+        // 用户点击了【关闭广告】按钮
+        if (res && res.isEnded) {
+          // 正常播放结束，可以下发游戏奖励
+          console.log('激励广告完成')
+          successCallback()
+        } else {
+          console.log('激励广告未完成')
+          unfinishCallback()
+          // 播放中途退出，不下发游戏奖励
+        }
+      })
+    }
+
+    // 用户触发广告后，显示激励视频广告
+    if (videoAd) {
+      videoAd.show().catch(() => {
+        // 失败重试
+        videoAd.load()
+          .then(() => videoAd.show())
+          .catch(err => {
+            console.error('激励视频 广告显示失败', err)
+            errorCallback()
+          })
+      })
     }
   },
   // 获取位置信息
@@ -159,6 +247,7 @@ Page({
           isLoading: true,
           dayWeather: {},
           sevenDayWeathers: [],
+          fifteenDayWeathers: [],
           thirtyDayWeathers: [],
           hourWeather: {},
           dayImage: '',
@@ -326,7 +415,7 @@ Page({
           isLoading: false
         })
         wx.showToast({
-          title: '获取近日天气失败',
+          title: '获取天气失败',
           icon: 'none',
         })
       }
@@ -390,12 +479,77 @@ Page({
           isLoading: false
         })
         wx.showToast({
-          title: '获取近日天气失败',
+          title: '获取天气失败',
           icon: 'none',
         })
       }
     })
   },
+
+    // 30日天气
+    fetchFifteenDayWeather(lon, lat) {
+      if (!lon || !lat) {
+        return
+      }
+      const that = this
+      wx.request({
+        url: 'https://api.qweather.com/v7/weather/15d',
+        method: 'GET', //请求的方式
+        data: { //发送到服务器的数据
+          location: `${lon},${lat}`,
+          key: charge_weather_key
+        },
+        success: function (res) { // 请求成功之后的回调函数
+          console.log('15日天气 ', res)
+          const code = res.data.code
+          console.log('15日天气code ', code)
+  
+          if (code == 403) {
+            wx.hideLoading();
+            that.setData({
+              isLoading: false
+            })
+            wx.showToast({
+              title: 'Run out of money',
+              icon: 'none',
+            })
+          }
+          const daysRes = res.data.daily
+          if (daysRes) {
+            daysRes.forEach(function (obj) {
+              const dayCode = obj.iconDay
+              const nightCode = obj.iconNight
+              obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
+              obj.iconNightUrl = `../../assets/icon_weather/${nightCode}.png`;
+              obj.isToday = isToday(obj.fxDate)
+              var date = new Date(obj.fxDate);
+              var dayOfWeek = date.getDay();
+              const onlyDate = obj.fxDate.substring(5)
+              var modifiedDate = onlyDate.replace("-", "/");
+              obj.showDate = modifiedDate
+              obj.weekStr = weeks[dayOfWeek]
+            });
+          }
+          wx.hideLoading();
+          that.setData({
+            fifteenDayWeathers: daysRes,
+            isLoading: false,
+            isChangeLocation: false
+          })
+        },
+        fail: function (res) {
+          console.log('获取15日天气失败: ', res)
+          wx.hideLoading();
+          that.setData({
+            isLoading: false
+          })
+          wx.showToast({
+            title: '获取天气失败',
+            icon: 'none',
+          })
+        }
+      })
+    },
 
   /**
    * 获取图表数据

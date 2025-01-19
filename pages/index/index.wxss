@@ -116,47 +116,6 @@
   margin-right: 20rpx;
 }
 
-.seven-day-weather {
-  display: flex;
-  width: 94%;  
-  height: 320px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.day-weather-show-wrapper {
-  display: flex;
-  /* padding: 0px 5px; */
-  /* background-color: red; */
-  width: 420px;
-}
-
-.day-weather-show {
-  display: flex;
-  flex: 0.15;
-  flex-direction: column;
-  min-width: 68px;
-  max-width: 68px;
-  justify-content: center;
-  align-items: center;
-  color: #111e36;
-  /* margin-right: 10px;   */
-  margin-bottom: 20px;
-  /* background-color: #fff; */
-}
-.day-weather-day-text {
-  margin-bottom: 10rpx; 
-  font-size: 15px;
-}
-.day-weather-date {
-  margin-bottom: 10rpx;
-  font-size: 16px;
-}
-
-.day-weather-img {
-  width: 50rpx;
-  height: 50rpx;
-}
 .selected-tab {
   display: flex;
   flex-direction:row;

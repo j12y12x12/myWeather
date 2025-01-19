@@ -2,6 +2,7 @@
   "usingComponents": {
     "ec-canvas": "../../ec-canvas/ec-canvas",
     "almanac": "../../components/almanac/almanac",
-    "moreservice": "../../components/moreservice/moreservice"
+    "moreservice": "../../components/moreservice/moreservice",
+    "dayWeather": "../../components/dayWeather/dayWeather"
   }
 }

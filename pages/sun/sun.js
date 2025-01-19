@@ -178,14 +178,19 @@ Page({
           icon: 'none',
         })
       },
-      function (errorMessage) {
+      function (unfinishMessage) {
         // 错误回调，打印错误信息
         console.log('激励广告未完成')
-        console.error('请求失败:', errorMessage);
+        console.error('未完成:', unfinishMessage);
         wx.showToast({
           title: '未完成，无法获取奖励',
           icon: 'none',
         })
+      },
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.error('请求失败:', errorMessage);
+        that.startGetSunData(selectedDate)
       })
     } else {
       this.startGetSunData(selectedDate)
@@ -214,7 +219,7 @@ Page({
     this.getSunData()
   },
 
-   showSunInspireAd(successCallback, errorCallback) {
+  showSunInspireAd(successCallback, unfinishCallback, errorCallback) {
     // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
     // 在页面中定义激励视频广告
     let videoAd = null
@@ -226,6 +231,7 @@ Page({
       videoAd.onLoad(() => {})
       videoAd.onError((err) => {
         console.error('激励视频光告加载失败', err)
+        errorCallback()
       })
       videoAd.onClose((res) => {
         // 用户点击了【关闭广告】按钮
@@ -235,8 +241,8 @@ Page({
           successCallback()
         } else {
           console.log('激励广告未完成')
+          unfinishCallback()
           // 播放中途退出，不下发游戏奖励
-          errorCallback()
         }
       })
     }
@@ -249,6 +255,7 @@ Page({
           .then(() => videoAd.show())
           .catch(err => {
             console.error('激励视频 广告显示失败', err)
+            errorCallback()
           })
       })
     }
