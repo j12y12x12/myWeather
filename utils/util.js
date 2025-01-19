@@ -126,7 +126,7 @@ const formatWeekDate = (dateStr) => {
   
     // 每天观看广告次数上限
     const maxAdCount = 7;
-    const minInterval = 30 * 1000; // 25秒
+    const minInterval = 60 * 1000; // 25秒
   
     const currentTime = currentDate.getTime();
   

@@ -180,10 +180,9 @@ Page({
           icon: 'none',
         })
       },
-      function (unfinishMessage) {
+      function () {
         // 错误回调，打印错误信息
         console.log('激励广告未完成')
-        console.error('未完成:', unfinishMessage);
         wx.showToast({
           title: '未完成，无法获取奖励',
           icon: 'none',

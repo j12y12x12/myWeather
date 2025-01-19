@@ -65,25 +65,33 @@ Page({
 
     // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
     // 在页面中定义插屏广告
-    let interstitialAd = null
 
     // 在页面onLoad回调事件中创建插屏广告实例
-    if (wx.createInterstitialAd) {
-      interstitialAd = wx.createInterstitialAd({
-        adUnitId: 'adunit-4ebe927a5bc6e9d4'
-      })
-      interstitialAd.onLoad(() => {})
-      interstitialAd.onError((err) => {
-        console.error('插屏广告加载失败', err)
-      })
-      interstitialAd.onClose(() => {})
-    }
+    if (util.checkAdLimit()) {
+      let interstitialAd = null
 
-    // 在适合的场景显示插屏广告
-    if (interstitialAd) {
-      interstitialAd.show().catch((err) => {
-        console.error('插屏广告显示失败', err)
-      })
+      if (wx.createInterstitialAd) {
+          interstitialAd = wx.createInterstitialAd({
+            adUnitId: 'adunit-4ebe927a5bc6e9d4'
+          })
+        interstitialAd.onLoad(() => {
+          console.log('插屏展示')
+        })
+        interstitialAd.onError((err) => {
+          console.error('插屏广告加载失败', err)
+        })
+        interstitialAd.onClose(() => {
+          console.error('插屏广告关闭')
+          util.onAdComplete()
+        })
+      }
+  
+      // 在适合的场景显示插屏广告
+      if (interstitialAd) {
+        interstitialAd.show().catch((err) => {
+          console.error('插屏广告显示失败', err)
+        })
+      }
     }
   },
 
@@ -245,10 +253,9 @@ Page({
           icon: 'none',
         })
       },
-      function (unfinishMessage) {
+      function () {
         // 错误回调，打印错误信息
         console.log('激励广告未完成')
-        console.error('未完成:', unfinishMessage);
         wx.showToast({
           title: '未完成，无法获取奖励',
           icon: 'none',

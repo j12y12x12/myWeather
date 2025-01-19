@@ -94,10 +94,9 @@ Page({
             icon: 'none',
           })
         },
-        function (unfinishMessage) {
+        function () {
           // 错误回调，打印错误信息
           console.log('激励广告未完成')
-          console.error('未完成:', unfinishMessage);
           wx.showToast({
             title: '未完成，无法获取奖励',
             icon: 'none',
@@ -350,7 +349,11 @@ Page({
           "hourWeather": res.data,
         })
         console.log('近两小时天气 ', that.data.hourWeather)
-        that.showEcharts()
+        if (res.data.minutely) {
+          that.showEcharts()
+        } else {
+          that.fetchMinuteWeatherCharge(lon, lat)
+        }
       },
       fail: function (res) {
         wx.showToast({
@@ -360,6 +363,41 @@ Page({
       }
     })
   },
+    // 近两小时天气
+    fetchMinuteWeatherCharge(lon, lat) {
+      if (!lon || !lat) {
+        return
+      }
+      const that = this
+      wx.request({
+        url: 'https://api.qweather.com/v7/minutely/5m',
+        method: 'GET', //请求的方式
+        data: { //发送到服务器的数据
+          location: `${lon},${lat}`,
+          key: charge_weather_key
+        },
+        success: function (res) { // 请求成功之后的回调函数
+          that.setData({
+            "hourWeather": res.data,
+          })
+          console.log('近两小时天气 ', that.data.hourWeather)
+          if (res.data.minutely) {
+            that.showEcharts()
+          } else {
+            wx.showToast({
+              title: '获取小时天气失败',
+              icon: 'none',
+            })
+          }
+        },
+        fail: function (res) {
+          wx.showToast({
+            title: '获取小时天气失败',
+            icon: 'none',
+          })
+        }
+      })
+    },
   // 当日天气
   fetchDayWeather(lon, lat) {
     if (!lon || !lat) {
@@ -376,13 +414,56 @@ Page({
       },
       success: function (res) { // 请求成功之后的回调函数
         console.log('实时天气 ', res)
-        const now = res.data.now
-        const imageCode = now.icon
-        const imageUrl = `../../assets/icon_weather/${imageCode}.png`
-        that.setData({
-          "dayWeather": now,
-          "dayImage": imageUrl
+        if (res.data.now) {
+          const now = res.data.now
+          const imageCode = now.icon
+          const imageUrl = `../../assets/icon_weather/${imageCode}.png`
+          that.setData({
+            "dayWeather": now,
+            "dayImage": imageUrl
+          })
+        } else {
+          that.fetchDayWeatherCharge(lon, lat)
+        }
+      },
+      fail: function (res) {
+
+        wx.showToast({
+          title: '获取实时天气失败',
+          icon: 'none',
         })
+      }
+    })
+  },
+  fetchDayWeatherCharge(lon, lat) {
+    if (!lon || !lat) {
+      console.log('经纬度为空');
+      return
+    }
+    const that = this
+    wx.request({
+      url: 'https://api.qweather.com/v7/weather/now',
+      method: 'GET', //请求的方式
+      data: { //发送到服务器的数据
+        location: `${lon},${lat}`,
+        key: charge_weather_key
+      },
+      success: function (res) { // 请求成功之后的回调函数
+        console.log('实时天气 ', res)
+        if (res.data.now) {
+          const now = res.data.now
+          const imageCode = now.icon
+          const imageUrl = `../../assets/icon_weather/${imageCode}.png`
+          that.setData({
+            "dayWeather": now,
+            "dayImage": imageUrl
+          })
+        } else {
+          wx.showToast({
+            title: '获取天气失败',
+            icon: 'none',
+          })
+        }
       },
       fail: function (res) {
 
@@ -405,6 +486,57 @@ Page({
       data: { //发送到服务器的数据
         location: `${lon},${lat}`,
         key: free_weather_key
+      },
+      success: function (res) { // 请求成功之后的回调函数
+        console.log('7日天气 ', res)
+        const sevenDays = res.data.daily
+        if (sevenDays) {
+  
+          sevenDays.forEach(function (obj) {
+            const dayCode = obj.iconDay
+            const nightCode = obj.iconNight
+            obj.iconDayUrl = `../../assets/icon_weather/${dayCode}.png`;
+            obj.iconNightUrl = `../../assets/icon_weather/${nightCode}.png`;
+            obj.isToday = isToday(obj.fxDate)
+            var date = new Date(obj.fxDate);
+            var dayOfWeek = date.getDay();
+            const onlyDate = obj.fxDate.substring(5)
+            var modifiedDate = onlyDate.replace("-", "/");
+            obj.showDate = modifiedDate
+            obj.weekStr = weeks[dayOfWeek]
+          });
+          wx.hideLoading();
+          that.setData({
+            "sevenDayWeathers": sevenDays,
+            isLoading: false
+          })
+        } else {
+          that.fetch7DayWeatherChange(lon,lat)
+        }
+      },
+      fail: function (res) {
+        wx.hideLoading();
+        that.setData({
+          isLoading: false
+        })
+        wx.showToast({
+          title: '获取天气失败',
+          icon: 'none',
+        })
+      }
+    })
+  },
+  fetch7DayWeatherChange(lon, lat) {
+    if (!lon || !lat) {
+      return
+    }
+    const that = this
+    wx.request({
+      url: 'https://api.qweather.com/v7/weather/7d',
+      method: 'GET', //请求的方式
+      data: { //发送到服务器的数据
+        location: `${lon},${lat}`,
+        key: charge_weather_key
       },
       success: function (res) { // 请求成功之后的回调函数
         console.log('7日天气 ', res)
@@ -461,10 +593,6 @@ Page({
         console.log('30日天气code ', code)
 
         if (code == 403) {
-          wx.hideLoading();
-          that.setData({
-            isLoading: false
-          })
           wx.showToast({
             title: 'Run out of money',
             icon: 'none',
@@ -486,7 +614,6 @@ Page({
             obj.weekStr = weeks[dayOfWeek]
           });
         }
-        wx.hideLoading();
         that.setData({
           "thirtyDayWeathers": thirtyDays,
           isLoading: false,
@@ -495,7 +622,6 @@ Page({
       },
       fail: function (res) {
         console.log('获取30日天气失败: ', res)
-        wx.hideLoading();
         that.setData({
           isLoading: false
         })
