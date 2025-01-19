@@ -165,6 +165,10 @@ Page({
     const that = this
     const selectIndex = event.currentTarget.dataset.index;
     if (selectIndex >= 6) {
+      wx.showToast({
+        title: '完成广告即可查询',
+        icon: 'none',
+      })
       this.showSunInspireAd( function (data) {
         // 成功回调，打印返回数据
         console.log('激励广告完成')
