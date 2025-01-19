@@ -114,7 +114,7 @@ Page({
     });
 
     // 生成今天及以后的 10 天
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 60; i++) {
       let date = new Date(currentDate);
       date.setDate(currentDate.getDate() + i); // 根据偏移量计算日期
       let dateString = this.formatDate(date);
@@ -161,15 +161,45 @@ Page({
   // 切换日期
   switchDate: function (event) {
     let selectedDate = event.currentTarget.dataset.date;
-    const showDate = selectedDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+    console.log('llllllll  ',event.currentTarget)
+    const that = this
+    const selectIndex = event.currentTarget.dataset.index;
+    if (selectIndex >= 6) {
+      this.showSunInspireAd( function (data) {
+        // 成功回调，打印返回数据
+        console.log('激励广告完成')
+        that.startGetSunData(selectedDate)
+        wx.showToast({
+          title: '免费不易，感谢支持~',
+          icon: 'none',
+        })
+      },
+      function (errorMessage) {
+        // 错误回调，打印错误信息
+        console.log('激励广告未完成')
+        console.error('请求失败:', errorMessage);
+        wx.showToast({
+          title: '未完成，无法获取奖励',
+          icon: 'none',
+        })
+      })
+    } else {
+      this.startGetSunData(selectedDate)
+    }
+
+  },
+
+  startGetSunData(selectDate) {
+
+    const showDate = selectDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
 
     this.setData({
-      selectedDate: selectedDate,
+      selectedDate: selectDate,
       showSelectedDate: showDate
     });
     // 更新选中的日期的状态
     let tabData = this.data.tabData.map(item => {
-      item.isSelected = item.date === selectedDate ? 1 : 0;
+      item.isSelected = item.date === selectDate ? 1 : 0;
       return item;
     });
 
@@ -178,7 +208,46 @@ Page({
     });
 
     this.getSunData()
+  },
 
+   showSunInspireAd(successCallback, errorCallback) {
+    // 若在开发者工具中无法预览广告，请切换开发者工具中的基础库版本
+    // 在页面中定义激励视频广告
+    let videoAd = null
+    // 在页面onLoad回调事件中创建激励视频广告实例
+    if (wx.createRewardedVideoAd) {
+      videoAd = wx.createRewardedVideoAd({
+        adUnitId: 'adunit-635e89465f456b53'
+      })
+      videoAd.onLoad(() => {})
+      videoAd.onError((err) => {
+        console.error('激励视频光告加载失败', err)
+      })
+      videoAd.onClose((res) => {
+        // 用户点击了【关闭广告】按钮
+        if (res && res.isEnded) {
+          // 正常播放结束，可以下发游戏奖励
+          console.log('激励广告完成')
+          successCallback()
+        } else {
+          console.log('激励广告未完成')
+          // 播放中途退出，不下发游戏奖励
+          errorCallback()
+        }
+      })
+    }
+
+    // 用户触发广告后，显示激励视频广告
+    if (videoAd) {
+      videoAd.show().catch(() => {
+        // 失败重试
+        videoAd.load()
+          .then(() => videoAd.show())
+          .catch(err => {
+            console.error('激励视频 广告显示失败', err)
+          })
+      })
+    }
   },
 
   selectLocation() {
@@ -262,8 +331,6 @@ Page({
             icon: 'none',
           })
         }
-        wx.hideLoading();
-
       },
       fail: function (res) {
         console.log('获取数据失败: ', res)

@@ -105,6 +105,41 @@ Page({
           "isLoading": false,
         })
         console.log('位置信息失败  ', res);
+        const lastShowTime = wx.getStorageSync('lastShowTime'); // 获取上次弹框显示的时间
+        const currentTime = new Date().getTime(); // 当前时间（毫秒）
+        // 如果上次弹框时间不存在，或者距离现在已经超过24小时，则显示弹框
+        if (!lastShowTime || Math.abs(currentTime - lastShowTime) > 12 * 60 * 60 * 1000) {
+          wx.showModal({
+            title: '定位未授权',
+            content: '查询附近天气信息需授权定位，是否去设置？',
+            confirmText: '去设置', // 修改确定按钮文案
+            cancelText: '取消', // 修改取消按钮文案        
+            success(res) {
+              if (res.confirm) {
+                // 用户点击去设置，打开小程序的设置页面
+                wx.openSetting({
+                  success(settingRes) {
+                    // 可以检查是否授权了定位
+                    if (settingRes.authSetting['scope.userLocation']) {
+                      // 如果用户授权了，重新调用获取位置的方法
+                      console.log('用户授权')
+                      that.onLoad();
+                    } else {
+                      // 用户仍未授权，提示用户
+                      wx.showToast({
+                        title: '定位权限未授权',
+                        icon: 'none'
+                      });
+                    }
+                  }
+                });
+              }
+              wx.setStorageSync('lastShowTime', new Date().getTime());
+            }
+          });
+        }
+
+
       }
     })
   },

@@ -11,7 +11,7 @@
   <!-- <view class="tabs-container"> -->
   <scroll-view class="date-tabs-scrollow" scroll-x="true" style="white-space: nowrap;">
     <view class="date-tabs">
-      <view wx:for="{{tabData}}" wx:key="index" class="{{item.isSelected === 1 ? 'selected-item' : 'normal-item'}}" bindtap="switchDate" data-date="{{item.date}}">
+      <view wx:for="{{tabData}}" wx:key="index" class="{{item.isSelected === 1 ? 'selected-item' : 'normal-item'}}" bindtap="switchDate" data-date="{{item.date}}" data-index="{{index}}">
         <text class="date-text">{{item.isToday === 1 ? '今天' : item.showStr}}</text>
         <text class="week-text">{{item.week}}</text>
       </view>

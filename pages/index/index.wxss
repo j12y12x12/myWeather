@@ -135,14 +135,22 @@
   display: flex;
   flex: 0.15;
   flex-direction: column;
-  min-width: 64px;
-  max-width: 64px;
+  min-width: 68px;
+  max-width: 68px;
   justify-content: center;
   align-items: center;
   color: #111e36;
   /* margin-right: 10px;   */
   margin-bottom: 20px;
   /* background-color: #fff; */
+}
+.day-weather-day-text {
+  margin-bottom: 10rpx; 
+  font-size: 15px;
+}
+.day-weather-date {
+  margin-bottom: 10rpx;
+  font-size: 16px;
 }
 
 .day-weather-img {
