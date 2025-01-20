@@ -93,6 +93,9 @@ Page({
         function (errorMessage) {
           // 错误回调，打印错误信息
           console.error('请求失败:', errorMessage);
+          that.setData({
+            address: '地址解析错误',
+          })
           wx.showToast({
             title: '地址解析失败',
             icon: 'none',

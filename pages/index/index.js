@@ -324,6 +324,7 @@ Page({
         wx.hideLoading();
         that.setData({
           "isLoading": false,
+          address: '地址解析错误',
         })
         wx.showToast({
           title: '地址解析失败',

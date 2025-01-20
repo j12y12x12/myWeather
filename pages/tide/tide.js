@@ -67,39 +67,37 @@ Page({
     // 在页面中定义插屏广告
 
     // 在页面onLoad回调事件中创建插屏广告实例
-    if (util.checkAdLimit()) {
-      let interstitialAd = null
+    let interstitialAd = null
 
-      if (wx.createInterstitialAd) {
-          interstitialAd = wx.createInterstitialAd({
-            adUnitId: 'adunit-4ebe927a5bc6e9d4'
-          })
-        interstitialAd.onLoad(() => {
-          console.log('插屏展示')
+    if (wx.createInterstitialAd) {
+      interstitialAd = wx.createInterstitialAd({
+        adUnitId: 'adunit-4ebe927a5bc6e9d4'
+      })
+      interstitialAd.onLoad(() => {
+        console.log('插屏展示')
+      })
+      interstitialAd.onError((err) => {
+        console.error('插屏广告加载失败', err)
+      })
+      interstitialAd.onClose(() => {
+        console.error('插屏广告关闭')
+        util.onAdComplete({
+          unUpdate: true
         })
-        interstitialAd.onError((err) => {
-          console.error('插屏广告加载失败', err)
-        })
-        interstitialAd.onClose(() => {
-          console.error('插屏广告关闭')
-          util.onAdComplete()
-        })
-      }
-  
-      // 在适合的场景显示插屏广告
-      if (interstitialAd) {
-        interstitialAd.show().catch((err) => {
-          console.error('插屏广告显示失败', err)
-        })
-      }
+      })
+    }
+
+    // 在适合的场景显示插屏广告
+    if (interstitialAd) {
+      interstitialAd.show().catch((err) => {
+        console.error('插屏广告显示失败', err)
+      })
     }
   },
 
   fetchData() {
     const that = this
     if (!this.data.longitude || !this.data.latitude) {
-      console.log('未查到信息 2')
-
       wx.showToast({
         title: '未获取到位置信息',
         icon: 'none',
@@ -167,6 +165,9 @@ Page({
       },
       function (errorMessage) {
         // 错误回调，打印错误信息
+        that.setData({
+          address: '地址解析错误',
+        })
         console.error('请求失败:', errorMessage);
         wx.showToast({
           title: '地址解析失败',
@@ -236,7 +237,7 @@ Page({
   switchDate: function (event) {
     let selectedDate = event.currentTarget.dataset.date;
 
-    console.log('llllllll  ',event.currentTarget)
+    console.log('llllllll  ', event.currentTarget)
     const that = this
     const selectIndex = event.currentTarget.dataset.index;
     if (selectIndex >= 5 && util.checkAdLimit()) {
@@ -244,28 +245,28 @@ Page({
         title: '完成广告即可查询',
         icon: 'none',
       })
-      this.showInspireAd( function (data) {
-        // 成功回调，打印返回数据
-        console.log('激励广告完成')
-        that.startGetTideData(selectedDate)
-        wx.showToast({
-          title: '免费不易，感谢支持~',
-          icon: 'none',
+      this.showInspireAd(function (data) {
+          // 成功回调，打印返回数据
+          console.log('激励广告完成')
+          that.startGetTideData(selectedDate)
+          wx.showToast({
+            title: '免费不易，感谢支持~',
+            icon: 'none',
+          })
+        },
+        function () {
+          // 错误回调，打印错误信息
+          console.log('激励广告未完成')
+          wx.showToast({
+            title: '未完成，无法获取奖励',
+            icon: 'none',
+          })
+        },
+        function (errorMessage) {
+          // 错误回调，打印错误信息
+          console.error('请求失败:', errorMessage);
+          that.startGetTideData(selectedDate)
         })
-      },
-      function () {
-        // 错误回调，打印错误信息
-        console.log('激励广告未完成')
-        wx.showToast({
-          title: '未完成，无法获取奖励',
-          icon: 'none',
-        })
-      },
-      function (errorMessage) {
-        // 错误回调，打印错误信息
-        console.error('请求失败:', errorMessage);
-        that.startGetTideData(selectedDate)
-      })
     } else {
       this.startGetTideData(selectedDate)
     }
@@ -329,7 +330,7 @@ Page({
           // 正常播放结束，可以下发游戏奖励
           successCallback()
           util.onAdComplete()
-          console.log('正常播放完成',res)
+          console.log('正常播放完成', res)
         } else {
           //提前关闭小程序
           console.log('中途退出', res);

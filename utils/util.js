@@ -72,39 +72,22 @@ const formatWeekDate = (dateStr) => {
         longitude: lon
       },
       success: function (res1) {
-        const address = res1.result.address_component
-        let addressDetail = ''
-        if (address.city && address.district) {
-          addressDetail = address.street ? `${address.city} ${address.district} ${address.street}` : `${address.city} ${address.district}`
+        console.log('地址解析结果 ',res1)
+        if (res1.status == 0) {
+          const address = res1.result.address_component
+          let addressDetail = ''
+          if (address.city && address.district) {
+            addressDetail = address.street ? `${address.city} ${address.district} ${address.street}` : `${address.city} ${address.district}`
+          } else {
+            addressDetail = '这是哪里？'
+          }
+          successCallback(addressDetail);
         } else {
-          addressDetail = '这是哪里？'
+          successCallback('地址未能解析');
         }
-        successCallback(addressDetail);
-
-        // that.setData({
-        //   address: addressDetail,
-        // })
-        // wx.setStorage({
-        //   key: 'locationData',
-        //   data: {
-        //     address: addressDetail,
-        //     latitude: lat,
-        //     longitude: lon
-        //   }
-        // });
-
       },
       fail: function (error) {
-
         errorCallback(`请求失败：${error.errMsg}`);
-        // wx.hideLoading();
-        // that.setData({
-        //   "isLoading": false,
-        // })
-        // wx.showToast({
-        //   title: '地址解析失败',
-        //   icon: 'none',
-        // })
       }
     })
   }
@@ -126,7 +109,7 @@ const formatWeekDate = (dateStr) => {
   
     // 每天观看广告次数上限
     const maxAdCount = 7;
-    const minInterval = 60 * 1000; // 25秒
+    const minInterval = 3 * 60 * 1000; // 间隔时间
   
     const currentTime = currentDate.getTime();
   
@@ -145,7 +128,7 @@ const formatWeekDate = (dateStr) => {
   }
   
   // 在广告完成时调用，更新观看次数
-  function onAdComplete() {
+  function onAdComplete({unUpdate = false} = {}) {
     const currentDate = new Date();
     const currentDateStr = currentDate.toISOString().split('T')[0]; // 获取当前日期（格式: YYYY-MM-DD）
   
@@ -154,7 +137,11 @@ const formatWeekDate = (dateStr) => {
     
     showAdData.day = currentDateStr
     // 更新观看次数
-    showAdData.count += 1;
+    if (!unUpdate) {
+      showAdData.count += 1;
+    } else {
+      console.log('不更新次数')
+    }
     showAdData.lastTime = currentDate.getTime();
   
     // 更新数据
