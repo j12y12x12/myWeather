@@ -94,7 +94,7 @@ Page({
           // 错误回调，打印错误信息
           console.error('请求失败:', errorMessage);
           that.setData({
-            address: '地址解析错误',
+            address: '当前位置',
           })
           wx.showToast({
             title: '地址解析失败',
@@ -119,7 +119,7 @@ Page({
     });
 
     // 生成今天及以后的 10 天
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 15; i++) {
       let date = new Date(currentDate);
       date.setDate(currentDate.getDate() + i); // 根据偏移量计算日期
       let dateString = this.formatDate(date);

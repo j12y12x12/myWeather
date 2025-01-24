@@ -2,7 +2,7 @@
 
 .tide-container {
   background-color: rgba(255, 255, 255, 0.9);
-  margin: 15px 15px 50px 15px;
+  margin: 15px 15px 0px 15px;
   border-radius: 5px;
   overflow-y: auto;  /* 如果内容过长，可以开启滚动 */
   flex-grow: 1;  /* 如果需要填满剩余空间 */
@@ -165,7 +165,7 @@ scroll-view {
   flex-direction: column;
   margin-left: 15px;
   margin-right: 15px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .ganhai-title {
@@ -178,6 +178,11 @@ scroll-view {
   font-size: 16px;
   color: #666666;
   margin-top: 5px;
+}
+
+.ad-view {
+  height: 10px;
+  margin: 5px 15px 50px 15px;
 }
 
 .background-fixed::before {

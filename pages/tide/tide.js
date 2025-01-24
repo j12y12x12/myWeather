@@ -166,7 +166,7 @@ Page({
       function (errorMessage) {
         // 错误回调，打印错误信息
         that.setData({
-          address: '地址解析错误',
+          address: '当前位置',
         })
         console.error('请求失败:', errorMessage);
         wx.showToast({
